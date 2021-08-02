@@ -1,5 +1,4 @@
 require "spec_helper"
-require "client"
 
 describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
   let(:conn) do

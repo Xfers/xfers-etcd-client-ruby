@@ -1,4 +1,4 @@
-require "client"
+require "xfers-etcd-client"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

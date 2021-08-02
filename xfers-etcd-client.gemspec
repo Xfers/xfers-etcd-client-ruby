@@ -1,4 +1,4 @@
-require_relative "lib/version"
+require_relative "lib/xfers/etcd/version"
 
 Gem::Specification.new do |s|
   s.name          = "xfers-etcd-client"
@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.description   = "Xfers etcd client"
   s.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 
-  s.files         = Dir["README.md", "Rakefile", "lib/*"]
+  s.files         = Dir["README.md", "lib/*"]
   s.homepage      = "https://github.com/Xfers/xfers-etcd-client-ruby"
   s.require_paths = ["lib"]
 
