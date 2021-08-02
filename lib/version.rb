@@ -1,5 +1,6 @@
 module Xfers
   module Etcd
-    VERSION = "0.10.0".freeze
+    # @private
+    VERSION = "0.10.1".freeze
   end
 end

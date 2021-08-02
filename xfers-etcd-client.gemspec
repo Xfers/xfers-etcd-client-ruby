@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage      = "https://github.com/Xfers/xfers-etcd-client-ruby"
   s.require_paths = ["lib"]
 
-  s.add_dependency "etcdv3", "~> 0.10"
+  s.add_dependency "etcdv3", "~> 0.11"
   s.add_development_dependency "pry-byebug", "~> 3.9"
   s.add_development_dependency "rake", "~> 13.0"
   s.add_development_dependency "rspec", "~> 3.7"
