@@ -1,0 +1,249 @@
+require:
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 2.5
+  NewCops: enable
+  SuggestExtensions: false
+Style/Documentation:
+  Enabled: false
+Lint/AmbiguousBlockAssociation:
+  Enabled: true
+
+#### Turning these off for now.
+#### These are useful but are hard to fix now
+Metrics/AbcSize:
+  Enabled: false
+Metrics/CyclomaticComplexity:
+  Enabled: false
+Metrics/PerceivedComplexity:
+  Enabled: false
+Metrics/ClassLength:
+  Enabled: false
+  Max: 1000
+Metrics/MethodLength:
+  Enabled: false
+  Max: 20
+Metrics/ParameterLists:
+  Enabled: false
+Metrics/ModuleLength:
+  Enabled: false
+Metrics/BlockLength:
+  Enabled: false
+###############################################
+
+Layout/LineLength:
+  Enabled: false
+
+## Naming
+Naming/AccessorMethodName:
+  Enabled: false
+Naming/PredicateName:
+  Enabled: false
+Naming/MethodName:
+  Enabled: false
+Naming/VariableNumber:
+  CheckSymbols: false
+
+## Style
+Style/RedundantSelf:
+  Enabled: false
+Style/ClassAndModuleChildren:
+  Enabled: false
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: never
+Style/NumericPredicate:
+  EnforcedStyle: comparison
+Style/MultilineBlockChain:
+  Enabled: false
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+Style/StringLiteralsInInterpolation:
+  EnforcedStyle: double_quotes
+Style/TrailingCommaInHashLiteral:
+  Enabled: false
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/TrailingCommaInArguments:
+  Enabled: false
+Style/CommentedKeyword:
+  Enabled: false
+# inline private for methods
+Style/AccessModifierDeclarations:
+  EnforcedStyle: inline
+# this causes the 0 -> 0o issue when passing numbers prefixed
+# with 0 into arguments (eg. chmod(0777) -> chmod(0o777))
+Style/NumericLiteralPrefix:
+  Enabled: false
+# This below cop may have potential bug, bbatsov/rubocop#4118
+Style/TernaryParentheses:
+  Enabled: false
+Style/GuardClause:
+  Enabled: false
+Style/Semicolon:
+  Enabled: false
+Style/Alias:
+  Enabled: false
+
+## Layout
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+Layout/FirstArgumentIndentation:
+  Enabled: true
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+Layout/MultilineArrayBraceLayout:
+  Enabled: false
+Layout/MultilineHashBraceLayout:
+  EnforcedStyle: new_line
+Layout/MultilineMethodCallBraceLayout:
+  EnforcedStyle: symmetrical
+Layout/MultilineMethodDefinitionBraceLayout:
+  EnforcedStyle: new_line
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/ParameterAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+Layout/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+Layout/FirstArrayElementLineBreak:
+  Enabled: true
+Layout/FirstHashElementLineBreak:
+  Enabled: true
+Layout/FirstMethodArgumentLineBreak:
+  Enabled: true
+Layout/FirstMethodParameterLineBreak:
+  Enabled: true
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+Layout/RescueEnsureAlignment:
+  Enabled: false
+
+## New cops
+Layout/BeginEndAlignment:
+  Enabled: true
+Layout/EmptyLinesAroundAttributeAccessor:
+  Enabled: true
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+Lint/BinaryOperatorWithIdenticalOperands:
+  Enabled: true
+Lint/ConstantDefinitionInBlock:
+  Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+Lint/DuplicateElsifCondition:
+  Enabled: true
+Lint/DuplicateRequire:
+  Enabled: true
+Lint/DuplicateRescueException:
+  Enabled: true
+Lint/EmptyConditionalBody:
+  Enabled: true
+Lint/EmptyFile:
+  Enabled: true
+Lint/FloatComparison:
+  Enabled: true
+Lint/IdentityComparison:
+  Enabled: true
+Lint/MissingSuper:
+  Enabled: true
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+Lint/OutOfRangeRegexpRef:
+  Enabled: true
+Lint/RaiseException:
+  Enabled: true
+Lint/SelfAssignment:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
+Lint/TopLevelReturnWithArgument:
+  Enabled: true
+Lint/TrailingCommaInAttributeDeclaration:
+  Enabled: true
+Lint/UnreachableLoop:
+  Enabled: true
+Lint/UselessMethodDefinition:
+  Enabled: true
+Lint/UselessTimes:
+  Enabled: true
+Lint/SymbolConversion:
+  Enabled: true
+
+## New cops Style
+
+Style/AccessorGrouping:
+  Enabled: true
+Style/BisectedAttrAccessor:
+  Enabled: true
+Style/CaseLikeIf:
+  Enabled: true
+Style/CombinableLoops:
+  Enabled: true
+Style/ExplicitBlockArgument:
+  Enabled: true
+Style/ExponentialNotation:
+  Enabled: true
+Style/GlobalStdStream:
+  Enabled: true
+Style/HashAsLastArrayItem:
+  Enabled: true
+Style/HashEachMethods:
+  Enabled: true
+Style/HashLikeCase:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+Style/KeywordParametersOrder:
+  Enabled: true
+Style/OptionalBooleanParameter:
+  Enabled: true
+Style/RedundantAssignment:
+  Enabled: true
+Style/RedundantFetchBlock:
+  Enabled: true
+Style/RedundantFileExtensionInRequire:
+  Enabled: true
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+Style/RedundantRegexpEscape:
+  Enabled: true
+Style/RedundantSelfAssignment:
+  Enabled: true
+Style/SingleArgumentDig:
+  Enabled: true
+Style/SlicingWithRange:
+  Enabled: true
+Style/SoleNestedConditional:
+  Enabled: true
+Style/StringConcatenation:
+  Enabled: true
+Style/ArrayCoercion:
+  Enabled: true
+Style/ClassEqualityComparison:
+  Enabled: true
+RSpec/ExampleLength:
+  Enabled: false
+RSpec/MultipleExpectations:
+  Enabled: false
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+RSpec/AnyInstance:
+  Enabled: false
+RSpec/NestedGroups:
+  Enabled: false
+RSpec/InstanceVariable:
+  Enabled: false
+RSpec/NamedSubject:
+  Enabled: false
+RSpec/LetSetup:
+  Enabled: false
+Metrics/BlockNesting:
+  Enabled: false
+Lint/EmptyBlock:
+  Enabled: true

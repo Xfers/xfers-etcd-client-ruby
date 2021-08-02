@@ -1,0 +1,4 @@
+--color
+--profile
+--format progress
+--require spec_helper

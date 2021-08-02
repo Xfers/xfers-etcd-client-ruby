@@ -1,0 +1,8 @@
+*.gem
+*.sh
+*.swp
+/.bundle
+/.vscode
+/.yardoc
+Gemfile.lock
+.rspec_status
