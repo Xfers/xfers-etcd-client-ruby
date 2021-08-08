@@ -1,23 +1,34 @@
 require "etcdv3"
-require_relative "./mutex"
+require "monitor"
+require_relative "mutex"
 
 module Xfers
   module Etcd
     # Etcd v3 client class
     class Client
       # Raw etcd client connection
-      attr_reader :etcd
+      attr_reader :client
 
-      extend Forwardable
-
-      # delegate transaction methods
-      def_delegators :@etcd, :transaction
-
-      # delegate misc. methods
-      def_delegators :@etcd, :version, :db_size, :alarm_list
+      include MonitorMixin
 
       def initialize(**options)
-        @etcd = ::Etcdv3.new(options)
+        @client = ::Etcdv3.new(options)
+
+        super() # Monitor#initialize
+      end
+
+      # Version of Etcd running on member
+      #
+      # @return [String] version string
+      def version
+        synchronize(&:version)
+      end
+
+      # Store size in bytes.
+      #
+      # @return [Integer] the size of the backend database, in bytes.
+      def db_size
+        synchronize(&:db_size)
       end
 
       # Check if a key exist
@@ -25,9 +36,11 @@ module Xfers
       # @param key [String] key
       # @return [Boolean] key exists or not
       def exist?(key)
-        self.class.valid_string_argument?("key", key)
-        response = self.etcd.get(key)
-        !response.kvs.empty?
+        synchronize do |client|
+          self.class.valid_string_argument?("key", key)
+          response = client.get(key)
+          !response.kvs.empty?
+        end
       end
 
       # Get the value of a key from etcd
@@ -36,15 +49,19 @@ module Xfers
       #
       # @return [Mvccpb::KeyValue] the value of key
       def get(key)
-        self.class.valid_string_argument?("key", key)
-        self.etcd.get(key).kvs.first
+        synchronize do |client|
+          self.class.valid_string_argument?("key", key)
+          client.get(key).kvs.first
+        end
       end
 
       # Get all keys currently stored
       #
       # @return [Array<Mvccpb::KeyValue>] sequence of key-value object
       def get_all
-        self.etcd.get("\0", range_end: "\0").kvs
+        synchronize do |client|
+          client.get("\0", range_end: "\0").kvs
+        end
       end
 
       # Get a range of keys with a prefix
@@ -53,12 +70,14 @@ module Xfers
       # @param sort_order [Symbol] sort order, possible values: `:none`, `:ascend`, `:descend`
       # @return [Array<Mvccpb::KeyValue>] sequence of  key-value objects
       def get_prefix(key_prefix, sort_order: :none)
-        self.class.valid_string_argument?("key_prefix", key_prefix)
-        options = {
-          range_end: prefix_range_end(key_prefix),
-          sort_order: sort_order,
-        }
-        self.etcd.get(key_prefix, options).kvs
+        synchronize do |client|
+          self.class.valid_string_argument?("key_prefix", key_prefix)
+          options = {
+            range_end: prefix_range_end(key_prefix),
+            sort_order: sort_order,
+          }
+          client.get(key_prefix, options).kvs
+        end
       end
 
       # Get a range of keys
@@ -69,13 +88,15 @@ module Xfers
       #
       # @return [Array<Mvccpb::KeyValue>] sequence of  key-value objects
       def get_range(range_start, range_end, sort_order: :none)
-        self.class.valid_string_argument?("range_start", range_start)
-        self.class.valid_string_argument?("range_end", range_end)
-        options = {
-          range_end: range_end,
-          sort_order: sort_order,
-        }
-        self.etcd.get(range_start, options).kvs
+        synchronize do |client|
+          self.class.valid_string_argument?("range_start", range_start)
+          self.class.valid_string_argument?("range_end", range_end)
+          options = {
+            range_end: range_end,
+            sort_order: sort_order,
+          }
+          client.get(range_start, options).kvs
+        end
       end
 
       # Save a value to etcd
@@ -83,11 +104,13 @@ module Xfers
       # @param key [String] key to set
       # @param ttl [Integer] the advisory time-to-live in seconds, defaults to live forever
       def put(key, value, ttl: nil)
-        self.class.valid_string_argument?("key", key)
-        options = {}
-        options[:lease] = self.lease_grant(ttl) if ttl&.respond_to?(:to_i)
-        self.etcd.put(key, value.to_s, options)
-        nil
+        synchronize do |client|
+          self.class.valid_string_argument?("key", key)
+          options = {}
+          options[:lease] = self.lease_grant(ttl) if ttl&.respond_to?(:to_i)
+          client.put(key, value.to_s, options)
+          nil
+        end
       end
 
       # Delete a single key
@@ -96,17 +119,19 @@ module Xfers
       #
       # @return [Integer] number of keys deleted
       def del(key)
-        self.class.valid_string_argument?("key", key)
-        response = self.etcd.del(key, {})
-        response.deleted
+        synchronize do |client|
+          self.class.valid_string_argument?("key", key)
+          client.del(key, {}).deleted
+        end
       end
 
       # Delete all keys
       #
       # @return [Integer] number of keys deleted
       def del_all
-        response = self.etcd.del("\0", range_end: "\0")
-        response.deleted
+        synchronize do |client|
+          client.del("\0", range_end: "\0").deleted
+        end
       end
 
       # Delete a range of keys with a prefix
@@ -114,12 +139,13 @@ module Xfers
       # @param key_prefix [String] first key in range
       # @return [Integer] number of keys deleted
       def del_prefix(key_prefix)
-        self.class.valid_string_argument?("key_prefix", key_prefix)
-        options = {
-          range_end: prefix_range_end(key_prefix),
-        }
-        response = self.etcd.del(key_prefix, options)
-        response.deleted
+        synchronize do |client|
+          self.class.valid_string_argument?("key_prefix", key_prefix)
+          options = {
+            range_end: prefix_range_end(key_prefix),
+          }
+          client.del(key_prefix, options).deleted
+        end
       end
 
       # Delete a range of keys
@@ -128,13 +154,14 @@ module Xfers
       # @param range_end [String] last key in range, exclusive
       # @return [Integer] number of keys deleted
       def del_range(range_start, range_end)
-        self.class.valid_string_argument?("range_start", range_start)
-        self.class.valid_string_argument?("range_end", range_end)
-        options = {
-          range_end: range_end,
-        }
-        response = self.etcd.del(range_start, options)
-        response.deleted
+        synchronize do |client|
+          self.class.valid_string_argument?("range_start", range_start)
+          self.class.valid_string_argument?("range_end", range_end)
+          options = {
+            range_end: range_end,
+          }
+          client.del(range_start, options).deleted
+        end
       end
 
       # Create a new lease
@@ -142,17 +169,21 @@ module Xfers
       # @param ttl [Integer] the advisory time-to-live in seconds
       # @return [Integer] lease id
       def lease_grant(ttl)
-        self.class.valid_ttl?(ttl)
-        self.etcd.lease_grant(ttl)["ID"]
+        synchronize do |client|
+          self.class.valid_ttl?(ttl)
+          client.lease_grant(ttl)["ID"]
+        end
       end
 
       # Revoke a lease
       #
       # @param lease_id [Integer] the lease ID for the lease
       def lease_revoke(lease_id)
-        self.class.valid_lease_id?(lease_id)
-        self.etcd.lease_revoke(lease_id)
-        nil
+        synchronize do |client|
+          self.class.valid_lease_id?(lease_id)
+          client.lease_revoke(lease_id)
+          nil
+        end
       end
 
       # Query the TTL of lease
@@ -160,8 +191,10 @@ module Xfers
       # @param lease_id [Integer] the lease ID for the lease
       # @return [Integer] the remaining TTL in seconds for the lease
       def lease_ttl(lease_id)
-        self.class.valid_lease_id?(lease_id)
-        self.etcd.lease_ttl(lease_id)["TTL"]
+        synchronize do |client|
+          self.class.valid_lease_id?(lease_id)
+          client.lease_ttl(lease_id)["TTL"]
+        end
       end
 
       # Keep the lease alive
@@ -169,8 +202,10 @@ module Xfers
       # @param lease_id [Integer] the lease ID for the lease
       # @return [Integer] the remaining TTL in seconds for the lease
       def lease_keep_alive_once(lease_id)
-        self.class.valid_lease_id?(lease_id)
-        self.etcd.lease_keep_alive_once(lease_id)["TTL"]
+        synchronize do |client|
+          self.class.valid_lease_id?(lease_id)
+          client.lease_keep_alive_once(lease_id)["TTL"]
+        end
       end
 
       # Create a new mutex instance
@@ -186,28 +221,67 @@ module Xfers
         Mutex.new(name, ttl: ttl, conn: self)
       end
 
-      # Watch for changes on a specified key range
+      # Watch for a key changes
       #
       # @param key [String] the key to register for watching
       # @param timeout [String]  the most waiting time in seconds, defaults to :command_timeout options
       #
       # @return [Array<Mvccpb::Event>, Nil] return events when event arrives, or Nil when timed out
       def watch(key, timeout: nil, &block)
-        self.class.valid_string_argument?("key", key)
-        self.etcd.watch(key, timeout: timeout, &block)
-      rescue GRPC::DeadlineExceeded
-        nil
+        synchronize do |client|
+          self.class.valid_string_argument?("key", key)
+          client.watch(key, timeout: timeout, &block)
+        rescue GRPC::DeadlineExceeded
+          nil
+        end
       end
 
-      # Watch forever for changes  on a specified key range
+      # Watch forever for a key changes
       #
       # @param key [String] the key to register for watching
       def watch_forever(key, &block)
-        self.class.valid_string_argument?("key", key)
-        loop do
-          self.etcd.watch(key, timeout: 60, &block)
+        synchronize do |client|
+          self.class.valid_string_argument?("key", key)
+          loop do
+            client.watch(key, timeout: 60, &block)
+          rescue GRPC::DeadlineExceeded
+            next
+          end
+        end
+      end
+
+      # Watch for a range of key change with a prefix
+      #
+      # @param key_prefix [String] first key in range
+      # @param timeout [String]  the most waiting time in seconds, defaults to :command_timeout options
+      #
+      # @return [Array<Mvccpb::Event>, Nil] return events when event arrives, or Nil when timed out
+      def watch_prefix(key_prefix, timeout: nil, &block)
+        synchronize do |client|
+          self.class.valid_string_argument?("key_prefix", key_prefix)
+          client.watch(key_prefix, range_end: prefix_range_end(key_prefix), timeout: timeout, &block)
         rescue GRPC::DeadlineExceeded
-          next
+          nil
+        end
+      end
+
+      # Watch forver for a range of key change with a prefix
+      #
+      # @param key [String] the key to register for watching
+      def watch_prefix_forever(key_prefix, &block)
+        synchronize do |client|
+          self.class.valid_string_argument?("key_prefix", key_prefix)
+          loop do
+            client.watch(key_prefix, range_end: prefix_range_end(key_prefix), timeout: 120, &block)
+          rescue GRPC::DeadlineExceeded
+            next
+          end
+        end
+      end
+
+      def transaction(timeout: nil, &block)
+        synchronize do |client|
+          client.transaction(timeout: timeout, &block)
         end
       end
 
@@ -220,6 +294,11 @@ module Xfers
           end
         end
         "\0"
+      end
+
+      # @private
+      def synchronize
+        mon_synchronize { yield(@client) }
       end
 
       # @private

@@ -11,12 +11,17 @@ Gem::Specification.new do |s|
   s.description   = "Xfers etcd client"
   s.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
 
-  s.files         = Dir["README.md", "lib/*"]
+  s.files         = Dir["README.md", "lib/xfers-etcd-client.rb", "lib/**/*"]
   s.homepage      = "https://github.com/Xfers/xfers-etcd-client-ruby"
   s.require_paths = ["lib"]
 
+  s.add_dependency "connection_pool", "~> 2.2"
   s.add_dependency "etcdv3", "~> 0.11"
+
+  s.add_development_dependency "benchmark-ips", "~> 2.9"
   s.add_development_dependency "pry-byebug", "~> 3.9"
   s.add_development_dependency "rake", "~> 13.0"
+  s.add_development_dependency "redis", "~> 4.4"
+  s.add_development_dependency "redlock", "~> 1.2"
   s.add_development_dependency "rspec", "~> 3.7"
 end

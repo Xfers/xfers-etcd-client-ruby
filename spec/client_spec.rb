@@ -4,25 +4,35 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
   let(:conn) do
     described_class.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
   end
+  let(:conn2) do
+    described_class.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+  end
 
   before do
     conn.del_all
   end
 
   it "invalid arguments" do
-    expect {conn.exist?("") }.to raise_error(ArgumentError)
-    expect {conn.get("") }.to raise_error(ArgumentError)
-    expect {conn.get_prefix("") }.to raise_error(ArgumentError)
-    expect {conn.get_range(nil) }.to raise_error(ArgumentError)
-    expect {conn.get_range("", "a") }.to raise_error(ArgumentError)
-    expect {conn.get_range("a", nil) }.to raise_error(ArgumentError)
-    expect {conn.put("", nil) }.to raise_error(ArgumentError)
-    expect {conn.del(nil) }.to raise_error(ArgumentError)
-    expect {conn.del_prefix(nil) }.to raise_error(ArgumentError)
-    expect {conn.del_prefix(nil) }.to raise_error(ArgumentError)
-    expect {conn.del_range(nil) }.to raise_error(ArgumentError)
-    expect {conn.del_range("", "a") }.to raise_error(ArgumentError)
-    expect {conn.del_range("a", nil) }.to raise_error(ArgumentError)
+    expect { conn.exist?("") }.to raise_error(ArgumentError)
+    expect { conn.get("") }.to raise_error(ArgumentError)
+    expect { conn.get_prefix("") }.to raise_error(ArgumentError)
+    expect { conn.get_range("", "a") }.to raise_error(ArgumentError)
+    expect { conn.get_range("a", nil) }.to raise_error(ArgumentError)
+    expect { conn.put("", nil) }.to raise_error(ArgumentError)
+    expect { conn.del(nil) }.to raise_error(ArgumentError)
+    expect { conn.del_prefix(nil) }.to raise_error(ArgumentError)
+    expect { conn.del_prefix(nil) }.to raise_error(ArgumentError)
+    expect { conn.del_range(nil) }.to raise_error(ArgumentError)
+    expect { conn.del_range("", "a") }.to raise_error(ArgumentError)
+    expect { conn.del_range("a", nil) }.to raise_error(ArgumentError)
+  end
+
+  it "#version" do
+    expect(conn.version).to be_a(String)
+  end
+
+  it "#db_size" do
+    expect(conn.db_size).to be_a(Integer)
   end
 
   it "#put with TTL" do
@@ -94,10 +104,10 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
 
   it "#watch" do
     Thread.new do
-      sleep(0.5)
+      sleep(0.2)
       10.times do
         sleep(0.1)
-        conn.put("watch_key", "test")
+        conn2.put("watch_key", "test")
       end
     end
     recv_count = 0
@@ -119,7 +129,7 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
       sleep(0.5)
       10.times do
         sleep(0.1)
-        conn.put("watch_key", "test")
+        conn2.put("watch_key", "test")
       end
     end
     recv_count = 0
@@ -134,5 +144,63 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     # should timeout after 1 second
     events = conn.watch("watch_key", timeout: 0.2)
     expect(events).to eq(nil)
+  end
+
+  it "#watch_prefix" do
+    Thread.new do
+      sleep(0.2)
+      10.times do |i|
+        sleep(0.1)
+        conn2.put("records/key#{i}", "test")
+      end
+    end
+    recv_count = 0
+    conn.watch_prefix("records/", timeout: 10) do |events|
+      events.each do |event|
+        puts event.kv.key
+        expect(event.kv.value).to eq("test")
+      end
+      recv_count += events.length
+      break if recv_count >= 10
+    end
+
+    events = conn.watch_prefix("records/", timeout: 0.2)
+    expect(events).to eq(nil)
+  end
+
+  it "#watch_prefix_forever" do
+    Thread.new do
+      sleep(0.2)
+      50.times do |i|
+        conn2.put("records/key#{i}", "test")
+      end
+    end
+    recv_count = 0
+    conn.watch_prefix_forever("records/") do |events|
+      events.each do |event|
+        expect(event.kv.value).to eq("test")
+      end
+      recv_count += events.length
+      break if recv_count >= 50
+    end
+
+    events = conn.watch_prefix("records/", timeout: 0.2)
+    expect(events).to eq(nil)
+  end
+
+  it "#transaction" do
+    conn.transaction do |txn|
+      txn.compare = [
+        txn.create_revision("key2", :less, 1)
+      ]
+      txn.success = [
+        txn.put("key2", "new_value")
+      ]
+      txn.failure = [
+        txn.put("key2", "fail_value")
+      ]
+    end
+
+    expect(conn.get("key2").value).to eq("new_value")
   end
 end

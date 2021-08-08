@@ -22,7 +22,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     expect(mutex1.unlock).to eq(true)
   end
 
-  it "try lock" do
+  it "#try_lock" do
     mutex = conn.mutex_new("lock1", ttl: 60)
     lock_time = Time.now
     mutex.lock
@@ -42,36 +42,35 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     expect(Time.now - lock_time).to be < 1
   end
 
-  it "lock with same name in single process" do
+  it "lock with same name in single thread" do
     mutex1 = conn.mutex_new("lock1", ttl: 2)
     mutex2 = conn.mutex_new("lock1", ttl: 10)
 
     first_lock_time = Time.now
     mutex1.lock(10)
-    mutex2.lock(10) do |mutex|
+    mutex2.lock(10) do
       expect(Time.now - first_lock_time).to be_between(2, 3)
     end
   end
 
-  it "mutex with same name in multiple threads" do
+  it "lock with same name in multiple threads" do
     mutex1 = conn.mutex_new("lock1", ttl: 2)
 
     first_lock_time = Time.now
     mutex1.lock
 
     threads = []
-    10.times do
+    5.times do
       threads << Thread.new do
-        mutex = conn.mutex_new("lock1", ttl: 10)
-        sleep(rand(20) / 10.0)
-        mutex.lock(10) do |t|
-          expect(Time.now - first_lock_time).to be_between(2, 5)
+        mutex = conn2.mutex_new("lock1", ttl: 10)
+        sleep(rand(15) / 10.0)
+        mutex.lock(10) do
+          locked_elasped = Time.now - first_lock_time
+          expect(locked_elasped).to be_between(2, 5)
         end
       end
     end
-    threads.each do |thread|
-      thread.join
-    end
+    threads.each(&:join)
   end
 
   it "mutex lock timed out" do
