@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>
+  File: README
+  
+    &mdash; Documentation by YARD 0.9.26
+  
+</title>
+
+  <link rel="stylesheet" href="css/style.css" type="text/css" />
+
+  <link rel="stylesheet" href="css/common.css" type="text/css" />
+
+<script type="text/javascript">
+  pathId = "README";
+  relpath = '';
+</script>
+
+
+  <script type="text/javascript" charset="utf-8" src="js/jquery.js"></script>
+
+  <script type="text/javascript" charset="utf-8" src="js/app.js"></script>
+
+
+  </head>
+  <body>
+    <div class="nav_wrap">
+      <iframe id="nav" src="class_list.html?1"></iframe>
+      <div id="resizer"></div>
+    </div>
+
+    <div id="main" tabindex="-1">
+      <div id="header">
+        <div id="menu">
+  
+    <a href="_index.html">Index</a> &raquo; 
+    <span class="title">File: README</span>
+  
+</div>
+
+        <div id="search">
+  
+    <a class="full_list_link" id="class_list_link"
+        href="class_list.html">
+
+        <svg width="24" height="24">
+          <rect x="0" y="4" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="12" width="24" height="4" rx="1" ry="1"></rect>
+          <rect x="0" y="20" width="24" height="4" rx="1" ry="1"></rect>
+        </svg>
+    </a>
+  
+</div>
+        <div class="clear"></div>
+      </div>
+
+      <div id="content"><div id='filecontents'><h1 id="xfers-etcd-v3-client">Xfers etcd v3 client</h1>
+
+<p>The Etcd v3 client library, provide high level functions for Etcd v3.</p>
+
+<h1 id="features">Features</h1>
+
+<ul>
+<li>GET: <code>get</code>, <code>get_all</code>, <code>get_prefix</code>, <code>get_prefix_count</code>, <code>get_range</code>, <code>get_range_count</code></li>
+<li>PUT: <code>put</code>, <code>put_all</code>, <code>put_prefix</code>, <code>put_range</code></li>
+<li>DELETE: <code>del</code>, <code>del_all</code>, <code>del_prefix</code>, <code>del_range</code></li>
+<li>LEASE: <code>lease_grant</code>, <code>lease_revoke</code>, <code>lease_ttl</code>, <code>lease_keep_alive_once</code></li>
+<li>WATCH: <code>watch</code>, <code>watch_forever</code></li>
+<li>TRANSACTION: <code>transaction</code></li>
+<li>Distributed Lock: <code>Xfers::Etcd::Mutex</code></li>
+</ul>
+
+<h1 id="examples">Examples</h1>
+
+<p><strong>Create a new etcd client</strong></p>
+
+<pre class="code ruby"><code class="ruby">  <span class='id identifier rubyid_conn'>conn</span> <span class='op'>=</span> <span class='const'><span class='object_link'><a href="Xfers.html" title="Xfers (module)">Xfers</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Xfers/Etcd.html" title="Xfers::Etcd (module)">Etcd</a></span></span><span class='op'>::</span><span class='const'><span class='object_link'><a href="Xfers/Etcd/Client.html" title="Xfers::Etcd::Client (class)">Client</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'><span class='object_link'><a href="Xfers/Etcd/Client.html#initialize-instance_method" title="Xfers::Etcd::Client#initialize (method)">new</a></span></span><span class='lparen'>(</span><span class='label'>endpoints:</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>http://127.0.0.2:2379</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</code></pre>
+
+<p><strong>Simple get &amp; put</strong></p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/config/token</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>token_1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+<span class='id identifier rubyid_token'>token</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/config/token</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='comment'># token.key == &quot;/config/token&quot;, token.value == &quot;token_1&quot;
+</span></code></pre>
+
+<p><strong>Get with prefix</strong></p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/1</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/3</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value3</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/biz_accounts/1</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>biz_account1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get_prefix'>get_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>sort_target:</span> <span class='symbol'>:key</span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:ascend</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_kv'>kv</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>key:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+<span class='comment'># [
+</span><span class='comment'>#   {key: &quot;/personal_accounts/1&quot;, value: &quot;value2&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/2&quot;, value: &quot;value1&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/3&quot;, value: &quot;value3&quot;},
+</span><span class='comment'># ]
+</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get_prefix'>get_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>sort_target:</span> <span class='symbol'>:key</span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:descend</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_kv'>kv</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>key:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+<span class='comment'># [
+</span><span class='comment'>#   {key: &quot;/personal_accounts/3&quot;, value: &quot;value3&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/2&quot;, value: &quot;value1&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/1&quot;, value: &quot;value2&quot;},
+</span><span class='comment'># ]
+</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get_prefix'>get_prefix</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>sort_target:</span> <span class='symbol'>:value</span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:ascend</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_kv'>kv</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>key:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+<span class='comment'># [
+</span><span class='comment'>#   {key: &quot;/personal_accounts/3&quot;, value: &quot;value3&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/1&quot;, value: &quot;value2&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/2&quot;, value: &quot;value1&quot;},
+</span><span class='comment'># ]
+</span></code></pre>
+
+<p><strong>Get range</strong></p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/1</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value2</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value1</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/3</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value3</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/4</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>value4</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get_range'>get_range</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/1</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/personal_accounts/4</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:ascend</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id identifier rubyid_kv'>kv</span><span class='op'>|</span> <span class='lbrace'>{</span> <span class='label'>key:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>value:</span> <span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span> <span class='rbrace'>}</span> <span class='rbrace'>}</span>
+<span class='comment'># [
+</span><span class='comment'>#   {key: &quot;/personal_accounts/1&quot;, value: &quot;value2&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/2&quot;, value: &quot;value1&quot;},
+</span><span class='comment'>#   {key: &quot;/personal_accounts/3&quot;, value: &quot;value3&quot;},
+</span><span class='comment'># ]
+</span>
+</code></pre>
+
+<p><strong>Put with TTL</strong></p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># put a key which will expire after 10 seconds
+</span><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/connections/1/tx_start_at</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_now'>now</span><span class='comma'>,</span> <span class='label'>ttl:</span> <span class='int'>10</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_sleep'>sleep</span><span class='lparen'>(</span><span class='int'>11</span><span class='rparen'>)</span>
+<span class='comment'># data == nil after 11 seconds
+</span><span class='id identifier rubyid_data'>data</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/connections/1/tx_start_at</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+</code></pre>
+
+<p><strong>Watch a key</strong></p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Watcher
+</span><span class='comment'># will print the following messages:
+</span><span class='comment'>#
+</span><span class='comment'># new value: test
+</span><span class='comment'># /models/bank_account/updated_at delete
+</span><span class='comment'># new value: test2
+</span><span class='comment'># /models/bank_account/updated_at delete
+</span><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_watch_forever'>watch_forever</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/models/bank_account/updated_at</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_events'>events</span><span class='op'>|</span>
+  <span class='id identifier rubyid_events'>events</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_event'>event</span><span class='op'>|</span>
+    <span class='kw'>case</span> <span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_type'>type</span>
+    <span class='kw'>when</span> <span class='symbol'>:PUT</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>new value: </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>when</span> <span class='symbol'>:DELETE</span>
+      <span class='id identifier rubyid_puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_event'>event</span><span class='period'>.</span><span class='id identifier rubyid_kv'>kv</span><span class='period'>.</span><span class='id identifier rubyid_key'>key</span><span class='embexpr_end'>}</span><span class='tstring_content'> deleted</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+</code></pre>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># Notifier
+</span><span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/models/bank_account/updated_at</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>test</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_delete'>delete</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/models/bank_account/updated_at</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>/models/bank_account/updated_at</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>test2</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>ttl:</span> <span class='int'>3</span><span class='rparen'>)</span>
+</code></pre>
+
+<p><strong>Mutex lock</strong></p>
+
+<pre class="code ruby"><code class="ruby"><span class='comment'># create a new mutex instance with 10 seconds TTL
+</span><span class='id identifier rubyid_mutex'>mutex</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_mutex_new'>mutex_new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>jobs/1</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>ttl:</span> <span class='int'>10</span><span class='rparen'>)</span>
+<span class='comment'># try to lock this mutex, will fail if it can&#39;t acquire lock after 2 second
+</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_lock'>lock</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_mu'>mu</span><span class='op'>|</span>
+  <span class='comment'># critical code
+</span>  <span class='comment'># ...
+</span>
+  <span class='comment'># refresh TTL of lock to avoid expire
+</span>  <span class='id identifier rubyid_mu'>mu</span><span class='period'>.</span><span class='id identifier rubyid_refresh'>refresh</span>
+
+  <span class='comment'># critical code
+</span>  <span class='comment'># ...
+</span><span class='kw'>end</span>
+<span class='comment'># will unlock automatically when block finished
+</span>
+<span class='comment'># can re-lock again
+</span><span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_try_lock'>try_lock</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_mu'>mu</span><span class='op'>|</span>
+  <span class='comment'># will be executed
+</span><span class='kw'>end</span>
+</code></pre>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_mutex'>mutex</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_mutex_new'>mutex_new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>jobs/1</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='label'>ttl:</span> <span class='int'>10</span><span class='rparen'>)</span>
+<span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_lock'>lock</span>
+
+<span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_lock'>lock</span><span class='lparen'>(</span><span class='int'>2</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_mu'>mu</span><span class='op'>|</span>
+  <span class='comment'># will not be executed, because the TTL is 10 second, and the lock will
+</span>  <span class='comment'># fail and return after 2 seconds
+</span><span class='kw'>end</span>
+
+<span class='id identifier rubyid_mutex'>mutex</span><span class='period'>.</span><span class='id identifier rubyid_lock'>lock</span><span class='lparen'>(</span><span class='int'>10</span><span class='rparen'>)</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_mu'>mu</span><span class='op'>|</span>
+  <span class='comment'># will be executed, because the TTL is 10 second, and the lock wait 10
+</span>  <span class='comment'># seconds, and the previous lock wait 2 seconds, so it can lock successfully
+</span><span class='kw'>end</span>
+</code></pre>
+
+<p><strong>Transaction</strong></p>
+
+<p>This sample code shows how to put the whole balance update procedures in transaction and makes the operation atomically.</p>
+
+<pre class="code ruby"><code class="ruby"><span class='id identifier rubyid_balanceKv'>balanceKv</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>balance</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+<span class='id identifier rubyid_remaining_balance'>remaining_balance</span> <span class='op'>=</span> <span class='id identifier rubyid_balanceKv'>balanceKv</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_d'>to_d</span> <span class='op'>-</span> <span class='int'>1000</span>
+
+<span class='id identifier rubyid_txn_result'>txn_result</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
+  <span class='id identifier rubyid_response'>response</span> <span class='op'>=</span> <span class='id identifier rubyid_conn'>conn</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_txn'>txn</span><span class='op'>|</span>
+    <span class='comment'># compare the last modification revision to make sure the balanceKv didn&#39;t modified by others
+</span>    <span class='id identifier rubyid_txn'>txn</span><span class='period'>.</span><span class='id identifier rubyid_compare'>compare</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+      <span class='id identifier rubyid_txn'>txn</span><span class='period'>.</span><span class='id identifier rubyid_mod_revision'>mod_revision</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>balance</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:equal</span><span class='comma'>,</span> <span class='id identifier rubyid_balanceKv'>balanceKv</span><span class='period'>.</span><span class='id identifier rubyid_mod_revision'>mod_revision</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='rbracket'>]</span>
+
+    <span class='comment'># set balance key to remaining_balance if compare success
+</span>    <span class='id identifier rubyid_txn'>txn</span><span class='period'>.</span><span class='id identifier rubyid_success'>success</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+      <span class='id identifier rubyid_txn'>txn</span><span class='period'>.</span><span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>balance</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_remaining_balance'>remaining_balance</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='rbracket'>]</span>
+
+    <span class='comment'># return current balance if compare fail
+</span>    <span class='id identifier rubyid_txn'>txn</span><span class='period'>.</span><span class='id identifier rubyid_failure'>failure</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+      <span class='id identifier rubyid_txn'>txn</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>balance</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='comma'>,</span>
+    <span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+
+  <span class='kw'>if</span> <span class='id identifier rubyid_txn_result'>txn_result</span><span class='period'>.</span><span class='id identifier rubyid_succeeded'>succeeded</span>
+    <span class='comment'># the transaction success
+</span>  <span class='kw'>else</span>
+    <span class='comment'># the transaction failed
+</span>    <span class='id identifier rubyid_current_balance'>current_balance</span> <span class='op'>=</span> <span class='id identifier rubyid_txn_result'>txn_result</span><span class='period'>.</span><span class='id identifier rubyid_responses'>responses</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_response_range'>response_range</span><span class='period'>.</span><span class='id identifier rubyid_kvs'>kvs</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id identifier rubyid_value'>value</span><span class='period'>.</span><span class='id identifier rubyid_to_d'>to_d</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span>
+
+</code></pre>
+</div></div>
+
+      <div id="footer">
+  Generated on Thu Dec  2 22:29:34 2021 by
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.9.26 (ruby-2.5.8).
+</div>
+
+    </div>
+  </body>
+</html>
