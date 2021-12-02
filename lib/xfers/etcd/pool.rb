@@ -1,9 +1,10 @@
 require "connection_pool"
-
+require_relative "client"
 module Xfers
   module Etcd
+    # Etcd v3 client connection pool
     class Pool
-      def initialize(pool_size: 5, pool_timeout: 5, **options)
+      def initialize(pool_size: 10, pool_timeout: 10, **options)
         @pool = ConnectionPool.new(pool_size: pool_size, pool_timeout: pool_timeout) do
           Client.new(**options)
         end
@@ -21,7 +22,7 @@ module Xfers
         @pool.size
       end
 
-      def pool_available
+      def pool_available?
         @pool.available
       end
 

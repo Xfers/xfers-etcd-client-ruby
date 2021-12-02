@@ -1,9 +1,12 @@
 require "securerandom"
+require_relative "errors"
 
 module Xfers
   module Etcd
     # Mutex class for distributed lock
     class Mutex
+      attr_reader :key, :uuid
+
       # Create a new mutex instance
       #
       # @param name [String] the mutex name. The mutex instance with the same name will be treat as indivisual mutex
@@ -20,7 +23,6 @@ module Xfers
         @revision = -1
         @conn = conn
         @uuid = SecureRandom.uuid
-        super() # Monitor#initialize
       end
 
       # Acquire the lock
@@ -33,6 +35,41 @@ module Xfers
       #
       # @return [Boolean] true if the lock has been acquired, false otherwise.
       def lock(timeout = 10, &block)
+        lock_impl(false, timeout, &block)
+      end
+
+      # Acquire the lock, raise Xfers::Etcd::LockError or Xfers::Etcd::UnockError if lock timeout
+      #
+      # @param timeout [Integer] Maximum time in seconds to wait before returning.
+      #   0 means return immediately if lock fail, and < 0 means wait forever.
+      #
+      # @yield a block to be called after lock acquired
+      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      def lock!(timeout = 10, &block)
+        lock_impl(true, timeout, &block)
+      end
+
+      # Try to acquire the lock, and return false immediately when failed to acquire/relase lock
+      #
+      # @yield a block to be called after lock acquired
+      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      #
+      # @return [Boolean] true if the lock has been acquired, false otherwise.
+      def try_lock(&block)
+        lock_impl(false, 0, &block)
+      end
+
+      # Try to acquire the lock and raise error immediately  when failed to acquire/relase lock,
+      # raise Xfers::Etcd::LockError when failed to acquire lock,
+      # raise Xfers::Etcd::UnlockError when failed to release lock
+      #
+      # @yield a block to be called after lock acquired
+      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      def try_lock!(&block)
+        lock_impl(true, 0, &block)
+      end
+
+      private def lock_impl(raise_error, timeout, &block)
         raise ArgumentError, "timeout needs to be a number" unless timeout.is_a?(Numeric)
 
         @conn.synchronize do
@@ -47,12 +84,18 @@ module Xfers
             break if acquire_result
 
             # return immediately if timeout is zero
-            return false if timeout.is_a?(Numeric) && timeout == 0
+            if timeout.is_a?(Numeric) && timeout == 0
+              return false unless raise_error
+              raise ::Xfers::Etcd::LockError.new, "Key: #{@key}, UUID: #{@uuid} timeout"
+            end
 
             # start to wait lock release
             if timeout > 0
               remaining_timeout = [(deadline - Time.now.to_f), 0].max
-              return false if remaining_timeout == 0
+              if remaining_timeout == 0
+                return false unless raise_error
+                raise ::Xfers::Etcd::LockError.new, "Key: #{@key}, UUID: #{@uuid} timeout"
+              end
             else
               remaining_timeout = nil
             end
@@ -60,25 +103,16 @@ module Xfers
             wait_delete_event(remaining_timeout)
           end
 
-          return true unless block_given?
+          return raise_error ? nil : true unless block_given?
 
           begin
             block.call self
-            true
+            raise_error ? nil : true
           ensure
-            unlock
+            unlock_result = unlock
+            raise ::Xfers::Etcd::UnlockError.new, "Key: #{@key}, UUID: #{@uuid} timeout" if unlock_result == false && raise_error
           end
         end # end of synchronize
-      end
-
-      # Try to acquire the lock, and return false immediately when lock acuired failed
-      #
-      # @yield a block to be called after lock acquired
-      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
-      #
-      # @return [Boolean] true if the lock has been acquired, false otherwise.
-      def try_lock(&block)
-        lock(0, &block)
       end
 
       # Release the lock
@@ -89,6 +123,24 @@ module Xfers
           response = conn.transaction do |txn|
             txn.compare = [
               txn.value(@key, :equal, @uuid)
+            ]
+
+            txn.success = [
+              txn.del(@key)
+            ]
+
+            txn.failure = []
+          end
+          response.succeeded
+        end
+      end
+
+      # Force destroy the lock key
+      def destroy!
+        @conn.synchronize do |conn|
+          response = conn.transaction do |txn|
+            txn.compare = [
+              txn.version(@key, :greater, 0)
             ]
 
             txn.success = [
@@ -117,6 +169,12 @@ module Xfers
           kv = conn.get(@key)
           return true if kv && kv.value == @uuid
           false
+        end
+      end
+
+      def lock_exist?
+        @conn.synchronize do |conn|
+          conn.get(@key, { count_only: true }).count > 0
         end
       end
 

@@ -104,23 +104,10 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
       break if recv_count >= 10
     end
 
-    # pool.with do |conn|
-    #   conn.watch("watch_key", timeout: 10) do |events|
-    #     puts "test"
-    #     events.each do |event|
-    #       expect(event.kv.value).to eq("test")
-    #     end
-    #     recv_count += events.length
-    #     puts recv_count
-    #     break if recv_count >= 10
-    #   end
-    # end
-
     # should timeout after 1 second
     pool.with do |conn|
       events = conn.watch("watch_key", timeout: 0.2)
-      puts events
-      # expect(events).to eq(nil)
+      expect(events).to eq(nil)
     end
   end
 

@@ -41,6 +41,13 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     expect(conn.exist?("key1")).to eq(false)
   end
 
+  it "#exists?" do
+    conn.put("key1", "")
+
+    expect(conn.exist?("key1")).to eq(true)
+    expect(conn.exist?("key2")).to eq(false)
+  end
+
   it "#get" do
     conn.put("key1", "value1")
     expect(conn.get("key1").value).to eq("value1")
@@ -56,22 +63,47 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
   end
 
   it "#get_prefix" do
-    conn.put("config/key1", "value1")
-    conn.put("config/key2", "value2")
+    conn.put("config/key1", "value2")
+    conn.put("config/key2", "value1")
+    conn.put("config/key3", "value3")
     conn.put("Config/key1", "value3")
 
-    expect(conn.get_prefix("config/").map(&:value)).to eq(%w[value1 value2])
-    expect(conn.get_prefix("config/", sort_order: :descend).map(&:value)).to eq(%w[value2 value1])
+    expect(conn.get_prefix("config/").map(&:value)).to eq(%w[value2 value1 value3])
+    expect(conn.get_prefix("config/", keys_only: true, sort_target: :key, sort_order: :ascend).map(&:key)).to eq(%w[config/key1 config/key2 config/key3])
+    expect(conn.get_prefix("config/", keys_only: true, sort_target: :key, sort_order: :ascend).map(&:value)).to eq(["", "", ""])
+    expect(conn.get_prefix("config/", sort_target: :key, sort_order: :ascend).map(&:value)).to eq(%w[value2 value1 value3])
+    expect(conn.get_prefix("config/", sort_target: :value, sort_order: :ascend).map(&:value)).to eq(%w[value1 value2 value3])
+    expect(conn.get_prefix("config/", sort_target: :key, sort_order: :descend).map(&:value)).to eq(%w[value3 value1 value2])
+    expect(conn.get_prefix("config/", sort_target: :value, sort_order: :descend).map(&:value)).to eq(%w[value3 value2 value1])
+  end
+
+  it "#get_prefix_count" do
+    conn.put("account/1", "acct1")
+    conn.put("account/2", "acct2")
+    conn.put("account/3", "acct3")
+    conn.put("biz_account/1", "biz_acct1")
+
+    expect(conn.get_prefix_count("account/")).to eq(3)
   end
 
   it "#get_range" do
-    conn.put("config1", "value1")
-    conn.put("config2", "value2")
+    conn.put("config1", "value2")
+    conn.put("config2", "value1")
     conn.put("config3", "value3")
     conn.put("config4", "value4")
 
-    expect(conn.get_range("config1", "config4").map(&:value)).to eq(%w[value1 value2 value3])
-    expect(conn.get_range("config1", "config4", sort_order: :descend).map(&:value)).to eq(%w[value3 value2 value1])
+    expect(conn.get_range("config1", "config4").map(&:value)).to eq(%w[value2 value1 value3])
+    expect(conn.get_range("config1", "config4", sort_target: :key, sort_order: :descend).map(&:value)).to eq(%w[value3 value1 value2])
+    expect(conn.get_range("config1", "config4", sort_target: :value, sort_order: :descend).map(&:value)).to eq(%w[value3 value2 value1])
+  end
+
+  it "#get_range_count" do
+    conn.put("account/1", "acct1")
+    conn.put("account/2", "acct2")
+    conn.put("account/3", "acct3")
+    conn.put("account/4", "acct4")
+
+    expect(conn.get_range_count("account/1", "account/4")).to eq(3)
   end
 
   it "#del" do
@@ -157,7 +189,6 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     recv_count = 0
     conn.watch_prefix("records/", timeout: 10) do |events|
       events.each do |event|
-        puts event.kv.key
         expect(event.kv.value).to eq("test")
       end
       recv_count += events.length

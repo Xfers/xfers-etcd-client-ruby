@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
-  let(:conn) do
+  let(:conn1) do
     Xfers::Etcd::Client.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
   end
   let(:conn2) do
@@ -9,13 +9,13 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   before do
-    conn.del("/etcd_mutex/lock1")
-    conn.del("/etcd_mutex/lock2")
+    conn1.del("/etcd_mutex/lock1")
+    conn1.del("/etcd_mutex/lock2")
   end
 
   it "lock and unlock" do
-    mutex1 = conn.mutex_new("lock1", ttl: 60)
-    mutex2 = conn.mutex_new("lock2", ttl: 10)
+    mutex1 = conn1.mutex_new("lock1", ttl: 60)
+    mutex2 = conn1.mutex_new("lock2", ttl: 10)
     expect(mutex1.lock(2)).to eq(true)
     expect(mutex2.lock(2)).to eq(true)
     expect(mutex2.unlock).to eq(true)
@@ -23,7 +23,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "#try_lock" do
-    mutex = conn.mutex_new("lock1", ttl: 60)
+    mutex = conn1.mutex_new("lock1", ttl: 60)
     lock_time = Time.now
     mutex.lock
     result = mutex.try_lock
@@ -42,9 +42,30 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     expect(Time.now - lock_time).to be < 1
   end
 
-  it "lock with same name in single thread" do
-    mutex1 = conn.mutex_new("lock1", ttl: 2)
-    mutex2 = conn.mutex_new("lock1", ttl: 10)
+  it "#try_lock!" do
+    mutex = conn1.mutex_new("lock1", ttl: 60)
+    lock_time = Time.now
+    mutex.lock
+    expect do
+      mutex.try_lock!
+    end.to raise_error(::Xfers::Etcd::LockError)
+    expect(Time.now - lock_time).to be < 1
+
+    mutex.unlock
+
+    execute_count = 0
+    lock_time = Time.now
+    expect do
+      mutex.try_lock! do
+        execute_count += 1
+      end
+    end.to change { execute_count }.by(1)
+    expect(Time.now - lock_time).to be < 1
+  end
+
+  it "#lock with same name in single thread" do
+    mutex1 = conn1.mutex_new("lock1", ttl: 2)
+    mutex2 = conn1.mutex_new("lock1", ttl: 10)
 
     first_lock_time = Time.now
     mutex1.lock(10)
@@ -53,8 +74,8 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     end
   end
 
-  it "lock with same name in multiple threads" do
-    mutex1 = conn.mutex_new("lock1", ttl: 2)
+  it "#lock with same name in multiple threads" do
+    mutex1 = conn1.mutex_new("lock1", ttl: 2)
 
     first_lock_time = Time.now
     mutex1.lock
@@ -73,21 +94,69 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     threads.each(&:join)
   end
 
-  it "mutex lock timed out" do
-    mutex1 = conn.mutex_new("lock1")
+  it "#lock timed out" do
+    mutex1 = conn1.mutex_new("lock1")
     mutex1.lock
-    expect(mutex1.lock(1)).to eq(false)
+    expect(mutex1.lock(0.1)).to eq(false)
+    mutex1.unlock
+  end
+
+  it "#lock! timed out" do
+    mutex1 = conn1.mutex_new("lock1")
+    mutex1.lock!
+    expect do
+      mutex1.lock!(0.1)
+    end.to raise_error(::Xfers::Etcd::LockError)
+    mutex1.unlock
   end
 
   it "mutex refresh" do
-    mutex1 = conn.mutex_new("lock1", ttl: 2)
+    mutex1 = conn1.mutex_new("lock1", ttl: 2)
     lock_time = Time.now
-    mutex1.lock(10) do |mutex|
+    mutex1.lock(7) do |mutex|
       5.times do
         sleep(1)
         mutex.refresh
       end
     end
-    expect(Time.now - lock_time).to be > 4
+    expect(Time.now - lock_time).to be > 1
   end
+
+  it "conncurrent access" do
+    2.times do
+      conn_access_test
+    end
+  end
+end
+
+def conn_access_test
+  conn1.put("balance", 1000.to_s)
+  conn1.mutex_new("balance_lock", ttl: 10).destroy!
+
+  expect(conn1.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
+
+  conn_pool = Xfers::Etcd::Pool.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+  threads = []
+  10.times.each do
+    threads << Thread.new do
+      100.times do
+        conn_pool.with do |conn|
+          loop do
+            mutex = conn.mutex_new("balance_lock", ttl: 10)
+            lock_result = mutex.lock(1) do
+              balance = conn.get("balance").value.to_i
+              break if balance < 1
+
+              conn.put("balance", (balance - 1).to_s)
+            end
+            break if lock_result
+          end
+        end
+      end
+    end
+  end
+
+  threads.each(&:join)
+
+  expect(conn_pool.get("balance").value.to_i).to be 0
 end

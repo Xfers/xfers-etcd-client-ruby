@@ -11,6 +11,13 @@ module Xfers
 
       include MonitorMixin
 
+      # Create a new etcd client connection
+      #
+      # @param endpoints [String] the etcd server endpoints, seperated by commas
+      # @param allow_reconnect [Boolean] allow to reconnect, defaults to `true`
+      # @param command_timeout [Integer] the default global timeout, unit is second, defaults to `120`
+      # @param user [String] the user name for authentication (if RBAC enabled on server side)
+      # @param password [String] the user password for authentication (if RBAC enabled on server side)
       def initialize(**options)
         @client = ::Etcdv3.new(options)
 
@@ -38,12 +45,11 @@ module Xfers
       def exist?(key)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
-          response = client.get(key)
-          !response.kvs.empty?
+          client.get(key, {count_only: true})&.count > 0
         end
       end
 
-      # Get the value of a key from etcd
+      # Get the key-value object of a key from etcd
       #
       # @param key [String] key to get
       #
@@ -55,7 +61,7 @@ module Xfers
         end
       end
 
-      # Get all keys currently stored
+      # Get all key-value objects currently stored
       #
       # @return [Array<Mvccpb::KeyValue>] sequence of key-value object
       def get_all
@@ -64,38 +70,68 @@ module Xfers
         end
       end
 
-      # Get a range of keys with a prefix
+      # Get a range of key-value objects with the prefix
       #
-      # @param key_prefix [String] first key in range
+      # @param key_prefix [String] the key prefix
+      # @param keys_only [Boolean] returns only the keys and not the values.
+      # @param sort_target [Symbol] sort target, possible values: `:key`, `:version`, `:create`, `:mode`, `:value`
       # @param sort_order [Symbol] sort order, possible values: `:none`, `:ascend`, `:descend`
-      # @return [Array<Mvccpb::KeyValue>] sequence of  key-value objects
-      def get_prefix(key_prefix, sort_order: :none)
+      # @return [Array<Mvccpb::KeyValue>] sequence of key-value objects
+      def get_prefix(key_prefix, keys_only: false, sort_target: :key, sort_order: :none)
         synchronize do |client|
           self.class.valid_string_argument?("key_prefix", key_prefix)
           options = {
             range_end: prefix_range_end(key_prefix),
+            keys_only: keys_only,
+            sort_target: sort_target,
             sort_order: sort_order,
           }
           client.get(key_prefix, options).kvs
         end
       end
 
-      # Get a range of keys
+      # Get the count of keys with the prefix
+      # @param key_prefix [String] the key prefix
+      #
+      # @return [Integer] the count the count of keys with the prefix
+      def get_prefix_count(key_prefix)
+        synchronize do |client|
+          self.class.valid_string_argument?("key_prefix", key_prefix)
+          client.get(key_prefix, {range_end: prefix_range_end(key_prefix), count_only: true}).count
+        end
+      end
+
+      # Get a range of key-value objects
       #
       # @param range_start [String] first key in range
       # @param range_end [String] last key in range, exclusive
+      # @param sort_target [Symbol] sort target, possible values: `:key`, `:version`, `:create`, `:mode`, `:value`
       # @param sort_order [Symbol] sort order, possible values: `:none`, `:ascend`, `:descend`
       #
       # @return [Array<Mvccpb::KeyValue>] sequence of  key-value objects
-      def get_range(range_start, range_end, sort_order: :none)
+      def get_range(range_start, range_end, sort_target: :key, sort_order: :none)
         synchronize do |client|
           self.class.valid_string_argument?("range_start", range_start)
           self.class.valid_string_argument?("range_end", range_end)
           options = {
             range_end: range_end,
+            sort_target: sort_target,
             sort_order: sort_order,
           }
           client.get(range_start, options).kvs
+        end
+      end
+
+      # Get the count of key range
+      # @param range_start [String] first key in range
+      # @param range_end [String] last key in range, exclusive
+      #
+      # @return [Integer] the count of key range
+      def get_range_count(range_start, range_end)
+        synchronize do |client|
+          self.class.valid_string_argument?("range_start", range_start)
+          self.class.valid_string_argument?("range_end", range_end)
+          client.get(range_start, {range_end: range_end, count_only: true}).count
         end
       end
 
