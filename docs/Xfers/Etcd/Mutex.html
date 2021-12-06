@@ -6,7 +6,7 @@
 <title>
   Class: Xfers::Etcd::Mutex
   
-    &mdash; Documentation by YARD 0.9.26
+    &mdash; Xfers Etcdv3 Client
   
 </title>
 
@@ -188,7 +188,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#destroy!-instance_method" title="#destroy! (instance method)">#<strong>destroy!</strong>  &#x21d2; Object </a>
+      <a href="#destroy!-instance_method" title="#destroy! (instance method)">#<strong>destroy!</strong>  &#x21d2; Boolean </a>
     
 
     
@@ -236,7 +236,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#lock-instance_method" title="#lock (instance method)">#<strong>lock</strong>(timeout = 10) {|the| ... } &#x21d2; Boolean </a>
+      <a href="#lock-instance_method" title="#lock (instance method)">#<strong>lock</strong>(timeout = 10) {|mutex| ... } &#x21d2; Boolean </a>
     
 
     
@@ -259,7 +259,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#lock!-instance_method" title="#lock! (instance method)">#<strong>lock!</strong>(timeout = 10) {|the| ... } &#x21d2; Object </a>
+      <a href="#lock!-instance_method" title="#lock! (instance method)">#<strong>lock!</strong>(timeout = 10) {|mutex| ... } </a>
     
 
     
@@ -273,7 +273,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Acquire the lock, raise Xfers::Etcd::LockError or Xfers::Etcd::UnockError if lock timeout.</p>
+    <span class="summary_desc"><div class='inline'><p>Acquire the lock, and raise error when failed to acquire/relase lock.</p>
 </div></span>
   
 </li>
@@ -296,7 +296,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Check if this lock already existed.</p>
+</div></span>
   
 </li>
 
@@ -327,7 +328,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#refresh-instance_method" title="#refresh (instance method)">#<strong>refresh</strong>  &#x21d2; Object </a>
+      <a href="#refresh-instance_method" title="#refresh (instance method)">#<strong>refresh</strong>  &#x21d2; Integer </a>
     
 
     
@@ -350,7 +351,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#try_lock-instance_method" title="#try_lock (instance method)">#<strong>try_lock</strong> {|the| ... } &#x21d2; Boolean </a>
+      <a href="#try_lock-instance_method" title="#try_lock (instance method)">#<strong>try_lock</strong> {|mutex| ... } &#x21d2; Boolean </a>
     
 
     
@@ -373,7 +374,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#try_lock!-instance_method" title="#try_lock! (instance method)">#<strong>try_lock!</strong> {|the| ... } &#x21d2; Object </a>
+      <a href="#try_lock!-instance_method" title="#try_lock! (instance method)">#<strong>try_lock!</strong> {|mutex| ... } </a>
     
 
     
@@ -387,7 +388,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Try to acquire the lock and raise error immediately  when failed to acquire/relase lock, raise Xfers::Etcd::LockError when failed to acquire lock, raise Xfers::Etcd::UnlockError when failed to release lock.</p>
+    <span class="summary_desc"><div class='inline'><p>Try to acquire the lock and raise error immediately when failed to acquire/relase lock.</p>
 </div></span>
   
 </li>
@@ -611,7 +612,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details first">
   <h3 class="signature first" id="destroy!-instance_method">
   
-    #<strong>destroy!</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>destroy!</strong>  &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -626,6 +627,23 @@ be released after this time elapses, unless refreshed.</p>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>true if the lock key destroyed, false otherwise</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -633,11 +651,6 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-139
-140
-141
-142
-143
 144
 145
 146
@@ -648,10 +661,15 @@ be released after this time elapses, unless refreshed.</p>
 151
 152
 153
-154</pre>
+154
+155
+156
+157
+158
+159</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 144</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_destroy!'>destroy!</span>
   <span class='ivar'>@conn</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_conn'>conn</span><span class='op'>|</span>
@@ -677,7 +695,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="lock-instance_method">
   
-    #<strong>lock</strong>(timeout = 10) {|the| ... } &#x21d2; <tt>Boolean</tt> 
+    #<strong>lock</strong>(timeout = 10) {|mutex| ... } &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -714,29 +732,12 @@ be released after this time elapses, unless refreshed.</p>
   
 </ul>
 
-<p class="tag_title">Yields:</p>
-<ul class="yield">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>a block to be called after lock acquired</p>
-</div>
-      
-    </li>
-  
-</ul>
 <p class="tag_title">Yield Parameters:</p>
 <ul class="yieldparam">
   
     <li>
       
-        <span class='name'>the</span>
+        <span class='name'>mutex</span>
       
       
         <span class='type'>(<tt><span class='object_link'><a href="" title="Xfers::Etcd::Mutex (class)">Xfers::Etcd::Mutex</a></span></tt>)</span>
@@ -744,7 +745,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>self mutex object</p>
+        <div class='inline'><p>the self mutex object</p>
 </div>
       
     </li>
@@ -761,7 +762,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>true if the lock has been acquired, false otherwise.</p>
+        <div class='inline'><p>true if the lock has been acquired, false otherwise</p>
 </div>
       
     </li>
@@ -774,12 +775,12 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
+36
 37
-38
-39</pre>
+38</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 36</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lock'>lock</span><span class='lparen'>(</span><span class='id identifier rubyid_timeout'>timeout</span> <span class='op'>=</span> <span class='int'>10</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_impl'>lock_impl</span><span class='lparen'>(</span><span class='kw'>false</span><span class='comma'>,</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -792,7 +793,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="lock!-instance_method">
   
-    #<strong>lock!</strong>(timeout = 10) {|the| ... } &#x21d2; <tt>Object</tt> 
+    #<strong>lock!</strong>(timeout = 10) {|mutex| ... } 
   
 
   
@@ -800,7 +801,7 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Acquire the lock, raise Xfers::Etcd::LockError or Xfers::Etcd::UnockError if lock timeout</p>
+    <p class="note returns_void">This method returns an undefined value.</p><p>Acquire the lock, and raise error when failed to acquire/relase lock</p>
 
 
   </div>
@@ -829,29 +830,12 @@ be released after this time elapses, unless refreshed.</p>
   
 </ul>
 
-<p class="tag_title">Yields:</p>
-<ul class="yield">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>a block to be called after lock acquired</p>
-</div>
-      
-    </li>
-  
-</ul>
 <p class="tag_title">Yield Parameters:</p>
 <ul class="yieldparam">
   
     <li>
       
-        <span class='name'>the</span>
+        <span class='name'>mutex</span>
       
       
         <span class='type'>(<tt><span class='object_link'><a href="" title="Xfers::Etcd::Mutex (class)">Xfers::Etcd::Mutex</a></span></tt>)</span>
@@ -859,7 +843,37 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>self mutex object</p>
+        <div class='inline'><p>the self mutex object</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="LockError.html" title="Xfers::Etcd::LockError (class)">Xfers::Etcd::LockError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if timeout or failed to acquire lock</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Xfers::Etcd::UnockError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if failed to release lock</p>
 </div>
       
     </li>
@@ -872,12 +886,12 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-48
-49
-50</pre>
+51
+52
+53</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 48</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 51</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lock!'>lock!</span><span class='lparen'>(</span><span class='id identifier rubyid_timeout'>timeout</span> <span class='op'>=</span> <span class='int'>10</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_impl'>lock_impl</span><span class='lparen'>(</span><span class='kw'>true</span><span class='comma'>,</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -898,7 +912,8 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    
+    <p>Check if this lock already existed</p>
+
 
   </div>
 </div>
@@ -914,6 +929,10 @@ be released after this time elapses, unless refreshed.</p>
       
       
       
+        &mdash;
+        <div class='inline'><p>true if the lock existed, false otherwise</p>
+</div>
+      
     </li>
   
 </ul>
@@ -924,14 +943,14 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-175
-176
-177
-178
-179</pre>
+185
+186
+187
+188
+189</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 185</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lock_exist?'>lock_exist?</span>
   <span class='ivar'>@conn</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_conn'>conn</span><span class='op'>|</span>
@@ -972,7 +991,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>true if the lock has been acquired, false otherwise.</p>
+        <div class='inline'><p>true if the lock has been acquired, false otherwise</p>
 </div>
       
     </li>
@@ -985,16 +1004,16 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-167
-168
-169
-170
-171
-172
-173</pre>
+174
+175
+176
+177
+178
+179
+180</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 174</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_locked?'>locked?</span>
   <span class='ivar'>@conn</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_conn'>conn</span><span class='op'>|</span>
@@ -1011,7 +1030,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="refresh-instance_method">
   
-    #<strong>refresh</strong>  &#x21d2; <tt>Object</tt> 
+    #<strong>refresh</strong>  &#x21d2; <tt>Integer</tt> 
   
 
   
@@ -1026,6 +1045,23 @@ be released after this time elapses, unless refreshed.</p>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the remaining TTL in seconds of this lock</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -1033,15 +1069,15 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-157
-158
-159
-160
-161
-162</pre>
+164
+165
+166
+167
+168
+169</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 157</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 164</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_refresh'>refresh</span>
   <span class='ivar'>@conn</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_conn'>conn</span><span class='op'>|</span>
@@ -1057,7 +1093,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="try_lock-instance_method">
   
-    #<strong>try_lock</strong> {|the| ... } &#x21d2; <tt>Boolean</tt> 
+    #<strong>try_lock</strong> {|mutex| ... } &#x21d2; <tt>Boolean</tt> 
   
 
   
@@ -1072,29 +1108,12 @@ be released after this time elapses, unless refreshed.</p>
 </div>
 <div class="tags">
   
-<p class="tag_title">Yields:</p>
-<ul class="yield">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>a block to be called after lock acquired</p>
-</div>
-      
-    </li>
-  
-</ul>
 <p class="tag_title">Yield Parameters:</p>
 <ul class="yieldparam">
   
     <li>
       
-        <span class='name'>the</span>
+        <span class='name'>mutex</span>
       
       
         <span class='type'>(<tt><span class='object_link'><a href="" title="Xfers::Etcd::Mutex (class)">Xfers::Etcd::Mutex</a></span></tt>)</span>
@@ -1102,7 +1121,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>self mutex object</p>
+        <div class='inline'><p>the self mutex object</p>
 </div>
       
     </li>
@@ -1119,7 +1138,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>true if the lock has been acquired, false otherwise.</p>
+        <div class='inline'><p>true if the lock has been acquired, false otherwise</p>
 </div>
       
     </li>
@@ -1132,12 +1151,12 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-58
-59
-60</pre>
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_try_lock'>try_lock</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_impl'>lock_impl</span><span class='lparen'>(</span><span class='kw'>false</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -1150,7 +1169,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="try_lock!-instance_method">
   
-    #<strong>try_lock!</strong> {|the| ... } &#x21d2; <tt>Object</tt> 
+    #<strong>try_lock!</strong> {|mutex| ... } 
   
 
   
@@ -1158,38 +1177,19 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Try to acquire the lock and raise error immediately  when failed to acquire/relase lock,
-raise Xfers::Etcd::LockError when failed to acquire lock,
-raise Xfers::Etcd::UnlockError when failed to release lock</p>
+    <p class="note returns_void">This method returns an undefined value.</p><p>Try to acquire the lock and raise error immediately when failed to acquire/relase lock</p>
 
 
   </div>
 </div>
 <div class="tags">
   
-<p class="tag_title">Yields:</p>
-<ul class="yield">
-  
-    <li>
-      
-      
-        <span class='type'></span>
-      
-      
-      
-        
-        <div class='inline'><p>a block to be called after lock acquired</p>
-</div>
-      
-    </li>
-  
-</ul>
 <p class="tag_title">Yield Parameters:</p>
 <ul class="yieldparam">
   
     <li>
       
-        <span class='name'>the</span>
+        <span class='name'>mutex</span>
       
       
         <span class='type'>(<tt><span class='object_link'><a href="" title="Xfers::Etcd::Mutex (class)">Xfers::Etcd::Mutex</a></span></tt>)</span>
@@ -1197,7 +1197,37 @@ raise Xfers::Etcd::UnlockError when failed to release lock</p>
       
       
         &mdash;
-        <div class='inline'><p>self mutex object</p>
+        <div class='inline'><p>the self mutex object</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="LockError.html" title="Xfers::Etcd::LockError (class)">Xfers::Etcd::LockError</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>if failed to acquire lock</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Xfers::Etcd::UnockError</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>when failed to release lock</p>
 </div>
       
     </li>
@@ -1210,12 +1240,12 @@ raise Xfers::Etcd::UnlockError when failed to release lock</p>
       <pre class="lines">
 
 
-68
-69
-70</pre>
+72
+73
+74</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 68</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_try_lock!'>try_lock!</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_lock_impl'>lock_impl</span><span class='lparen'>(</span><span class='kw'>true</span><span class='comma'>,</span> <span class='int'>0</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
@@ -1267,10 +1297,6 @@ raise Xfers::Etcd::UnlockError when failed to release lock</p>
       <pre class="lines">
 
 
-121
-122
-123
-124
 125
 126
 127
@@ -1282,10 +1308,14 @@ raise Xfers::Etcd::UnlockError when failed to release lock</p>
 133
 134
 135
-136</pre>
+136
+137
+138
+139
+140</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 121</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/mutex.rb', line 125</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_unlock'>unlock</span>
   <span class='ivar'>@conn</span><span class='period'>.</span><span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_conn'>conn</span><span class='op'>|</span>
@@ -1313,7 +1343,7 @@ raise Xfers::Etcd::UnlockError when failed to release lock</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Dec  2 22:29:34 2021 by
+  Generated on Sun Dec  5 21:41:41 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-2.5.8).
 </div>

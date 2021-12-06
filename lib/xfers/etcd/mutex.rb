@@ -30,41 +30,45 @@ module Xfers
       # @param timeout [Integer] Maximum time in seconds to wait before returning.
       #   0 means return immediately if lock fail, and < 0 means wait forever.
       #
-      # @yield a block to be called after lock acquired
-      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      # @yieldparam [Xfers::Etcd::Mutex] mutex the self mutex object
       #
-      # @return [Boolean] true if the lock has been acquired, false otherwise.
+      # @return [Boolean] true if the lock has been acquired, false otherwise
       def lock(timeout = 10, &block)
         lock_impl(false, timeout, &block)
       end
 
-      # Acquire the lock, raise Xfers::Etcd::LockError or Xfers::Etcd::UnockError if lock timeout
+      # Acquire the lock, and raise error when failed to acquire/relase lock
       #
       # @param timeout [Integer] Maximum time in seconds to wait before returning.
       #   0 means return immediately if lock fail, and < 0 means wait forever.
       #
-      # @yield a block to be called after lock acquired
-      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      # @yieldparam [Xfers::Etcd::Mutex] mutex the self mutex object
+      #
+      # @raise [Xfers::Etcd::LockError] if timeout or failed to acquire lock
+      # @raise [Xfers::Etcd::UnockError] if failed to release lock
+      #
+      # @return [void]
       def lock!(timeout = 10, &block)
         lock_impl(true, timeout, &block)
       end
 
       # Try to acquire the lock, and return false immediately when failed to acquire/relase lock
       #
-      # @yield a block to be called after lock acquired
-      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      # @yieldparam [Xfers::Etcd::Mutex] mutex the self mutex object
       #
-      # @return [Boolean] true if the lock has been acquired, false otherwise.
+      # @return [Boolean] true if the lock has been acquired, false otherwise
       def try_lock(&block)
         lock_impl(false, 0, &block)
       end
 
-      # Try to acquire the lock and raise error immediately  when failed to acquire/relase lock,
-      # raise Xfers::Etcd::LockError when failed to acquire lock,
-      # raise Xfers::Etcd::UnlockError when failed to release lock
+      # Try to acquire the lock and raise error immediately when failed to acquire/relase lock
       #
-      # @yield a block to be called after lock acquired
-      # @yieldparam [Xfers::Etcd::Mutex] the self mutex object
+      # @yieldparam [Xfers::Etcd::Mutex] mutex the self mutex object
+      #
+      # @raise [Xfers::Etcd::LockError] if failed to acquire lock
+      # @raise [Xfers::Etcd::UnockError] when failed to release lock
+      #
+      # @return [void]
       def try_lock!(&block)
         lock_impl(true, 0, &block)
       end
@@ -136,6 +140,7 @@ module Xfers
       end
 
       # Force destroy the lock key
+      # @return [Boolean] true if the lock key destroyed, false otherwise
       def destroy!
         @conn.synchronize do |conn|
           response = conn.transaction do |txn|
@@ -154,6 +159,8 @@ module Xfers
       end
 
       # Refresh the time-to-live on this lock
+      #
+      # @return [Integer] the remaining TTL in seconds of this lock
       def refresh
         @conn.synchronize do |conn|
           raise NameError, "No lease associated with this lock" unless @lease_id
@@ -163,7 +170,7 @@ module Xfers
 
       # Check if this lock is currently acquired
       #
-      # @return [Boolean] true if the lock has been acquired, false otherwise.
+      # @return [Boolean] true if the lock has been acquired, false otherwise
       def locked?
         @conn.synchronize do |conn|
           kv = conn.get(@key)
@@ -172,6 +179,9 @@ module Xfers
         end
       end
 
+      # Check if this lock already existed
+      #
+      # @return [Boolean] true if the lock existed, false otherwise
       def lock_exist?
         @conn.synchronize do |conn|
           conn.get(@key, { count_only: true }).count > 0

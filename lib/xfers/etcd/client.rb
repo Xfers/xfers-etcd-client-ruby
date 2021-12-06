@@ -1,12 +1,15 @@
 require "etcdv3"
 require "monitor"
 require_relative "mutex"
+require_relative "transaction"
 
 module Xfers
   module Etcd
-    # Etcd v3 client class
+    # Xfers etcd v3 client class, it wraps {https://www.rubydoc.info/gems/etcdv3/ etcdv3-ruby} gem
+    # and provides some advanced feature like: {Mutex}, {#watch_forever}...etc
     class Client
-      # Raw etcd client connection
+      # Raw {https://www.rubydoc.info/gems/etcdv3/Etcdv3 Etcdv3} instance
+      # @return [Etcdv3]
       attr_reader :client
 
       include MonitorMixin
@@ -41,11 +44,13 @@ module Xfers
       # Check if a key exist
       #
       # @param key [String] key
+      #
       # @return [Boolean] key exists or not
       def exist?(key)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
-          client.get(key, {count_only: true})&.count > 0
+          count = client.get(key, { count_only: true })&.count
+          !count.nil? && count > 0
         end
       end
 
@@ -73,9 +78,10 @@ module Xfers
       # Get a range of key-value objects with the prefix
       #
       # @param key_prefix [String] the key prefix
-      # @param keys_only [Boolean] returns only the keys and not the values.
+      # @param keys_only [Boolean] returns only the keys.
       # @param sort_target [Symbol] sort target, possible values: `:key`, `:version`, `:create`, `:mode`, `:value`
       # @param sort_order [Symbol] sort order, possible values: `:none`, `:ascend`, `:descend`
+      #
       # @return [Array<Mvccpb::KeyValue>] sequence of key-value objects
       def get_prefix(key_prefix, keys_only: false, sort_target: :key, sort_order: :none)
         synchronize do |client|
@@ -97,7 +103,7 @@ module Xfers
       def get_prefix_count(key_prefix)
         synchronize do |client|
           self.class.valid_string_argument?("key_prefix", key_prefix)
-          client.get(key_prefix, {range_end: prefix_range_end(key_prefix), count_only: true}).count
+          client.get(key_prefix, { range_end: prefix_range_end(key_prefix), count_only: true }).count
         end
       end
 
@@ -105,16 +111,18 @@ module Xfers
       #
       # @param range_start [String] first key in range
       # @param range_end [String] last key in range, exclusive
+      # @param keys_only [Boolean] returns only the keys.
       # @param sort_target [Symbol] sort target, possible values: `:key`, `:version`, `:create`, `:mode`, `:value`
       # @param sort_order [Symbol] sort order, possible values: `:none`, `:ascend`, `:descend`
       #
       # @return [Array<Mvccpb::KeyValue>] sequence of  key-value objects
-      def get_range(range_start, range_end, sort_target: :key, sort_order: :none)
+      def get_range(range_start, range_end, keys_only: false, sort_target: :key, sort_order: :none)
         synchronize do |client|
           self.class.valid_string_argument?("range_start", range_start)
           self.class.valid_string_argument?("range_end", range_end)
           options = {
             range_end: range_end,
+            keys_only: keys_only,
             sort_target: sort_target,
             sort_order: sort_order,
           }
@@ -131,14 +139,17 @@ module Xfers
         synchronize do |client|
           self.class.valid_string_argument?("range_start", range_start)
           self.class.valid_string_argument?("range_end", range_end)
-          client.get(range_start, {range_end: range_end, count_only: true}).count
+          client.get(range_start, { range_end: range_end, count_only: true }).count
         end
       end
 
-      # Save a value to etcd
+      # Set a value to specific key
       #
-      # @param key [String] key to set
+      # @param key [String] key name
+      # @param value [String] the value of key
       # @param ttl [Integer] the advisory time-to-live in seconds, defaults to live forever
+      #
+      # @return [void]
       def put(key, value, ttl: nil)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
@@ -173,6 +184,7 @@ module Xfers
       # Delete a range of keys with a prefix
       #
       # @param key_prefix [String] first key in range
+      #
       # @return [Integer] number of keys deleted
       def del_prefix(key_prefix)
         synchronize do |client|
@@ -188,6 +200,7 @@ module Xfers
       #
       # @param range_start [String] first key in range
       # @param range_end [String] last key in range, exclusive
+      #
       # @return [Integer] number of keys deleted
       def del_range(range_start, range_end)
         synchronize do |client|
@@ -203,6 +216,7 @@ module Xfers
       # Create a new lease
       #
       # @param ttl [Integer] the advisory time-to-live in seconds
+      #
       # @return [Integer] lease id
       def lease_grant(ttl)
         synchronize do |client|
@@ -214,6 +228,8 @@ module Xfers
       # Revoke a lease
       #
       # @param lease_id [Integer] the lease ID for the lease
+      #
+      # @return [void]
       def lease_revoke(lease_id)
         synchronize do |client|
           self.class.valid_lease_id?(lease_id)
@@ -225,6 +241,7 @@ module Xfers
       # Query the TTL of lease
       #
       # @param lease_id [Integer] the lease ID for the lease
+      #
       # @return [Integer] the remaining TTL in seconds for the lease
       def lease_ttl(lease_id)
         synchronize do |client|
@@ -236,6 +253,7 @@ module Xfers
       # Keep the lease alive
       #
       # @param lease_id [Integer] the lease ID for the lease
+      #
       # @return [Integer] the remaining TTL in seconds for the lease
       def lease_keep_alive_once(lease_id)
         synchronize do |client|
@@ -257,16 +275,19 @@ module Xfers
         Mutex.new(name, ttl: ttl, conn: self)
       end
 
-      # Watch for a key changes
+      # Watch for changes on a key
       #
       # @param key [String] the key to register for watching
-      # @param timeout [String]  the most waiting time in seconds, defaults to :command_timeout options
+      # @param timeout [Integer]  the most waiting time in seconds, defaults to :command_timeout options
+      # @param start_revision [Integer] the revision for where to inclusively begin watching
       #
-      # @return [Array<Mvccpb::Event>, Nil] return events when event arrives, or Nil when timed out
-      def watch(key, timeout: nil, &block)
+      # @yieldparam [Array<Mvccpb::Event>] events a list of new events in sequence
+      #
+      # @return [Array<Mvccpb::Event>, Nil] return events when event arrives if no given block, Nil when timed out or has given block
+      def watch(key, timeout: nil, start_revision: nil, &block)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
-          client.watch(key, timeout: timeout, &block)
+          client.watch(key, timeout: timeout, start_revision: start_revision, &block)
         rescue GRPC::DeadlineExceeded
           nil
         end
@@ -275,46 +296,63 @@ module Xfers
       # Watch forever for a key changes
       #
       # @param key [String] the key to register for watching
-      def watch_forever(key, &block)
+      # @param start_revision [Integer] the revision for where to inclusively begin watching
+      #
+      # @yieldparam [Array<Mvccpb::Event>] events a list of new events in sequence
+      #
+      # @return [void]
+      def watch_forever(key, start_revision: nil, &block)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
           loop do
-            client.watch(key, timeout: 60, &block)
+            client.watch(key, timeout: 60, start_revision: start_revision, &block)
           rescue GRPC::DeadlineExceeded
             next
           end
         end
+        nil
       end
 
-      # Watch for a range of key change with a prefix
+      # Watch for changes on a specified key prefix
       #
       # @param key_prefix [String] first key in range
-      # @param timeout [String]  the most waiting time in seconds, defaults to :command_timeout options
+      # @param timeout [Integer] the most waiting time in seconds, defaults to :command_timeout options
+      # @param start_revision [Integer] the revision for where to inclusively begin watching
       #
-      # @return [Array<Mvccpb::Event>, Nil] return events when event arrives, or Nil when timed out
-      def watch_prefix(key_prefix, timeout: nil, &block)
+      # @yieldparam [Array<Mvccpb::Event>] events a list of new events in sequence
+      #
+      # @return [Array<Mvccpb::Event>, Nil] return events when event arrives if no given block, Nil when timed out or has given block
+      def watch_prefix(key_prefix, timeout: nil, start_revision: nil, &block)
         synchronize do |client|
           self.class.valid_string_argument?("key_prefix", key_prefix)
-          client.watch(key_prefix, range_end: prefix_range_end(key_prefix), timeout: timeout, &block)
+          client.watch(key_prefix, range_end: prefix_range_end(key_prefix), timeout: timeout, start_revision: start_revision, &block)
         rescue GRPC::DeadlineExceeded
           nil
         end
       end
 
-      # Watch forver for a range of key change with a prefix
+      # Watch forever for changes on a specified key prefix
       #
       # @param key [String] the key to register for watching
-      def watch_prefix_forever(key_prefix, &block)
+      # @param start_revision [Integer] the revision for where to inclusively begin watching
+      #
+      # @return [void]
+      def watch_prefix_forever(key_prefix, start_revision: nil, &block)
         synchronize do |client|
           self.class.valid_string_argument?("key_prefix", key_prefix)
           loop do
-            client.watch(key_prefix, range_end: prefix_range_end(key_prefix), timeout: 120, &block)
+            client.watch(key_prefix, range_end: prefix_range_end(key_prefix), timeout: 120, start_revision: start_revision, &block)
           rescue GRPC::DeadlineExceeded
             next
           end
         end
       end
 
+      # Transaction
+      #
+      # @yieldparam [Xfers::Etcd::Transaction] txn the transaction opertaion object
+      #
+      # @return [Etcdserverpb::TxnResponse]
       def transaction(timeout: nil, &block)
         synchronize do |client|
           client.transaction(timeout: timeout, &block)

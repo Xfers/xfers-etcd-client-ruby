@@ -6,7 +6,7 @@ The Etcd v3 client library, provide high level functions for Etcd v3.
 * PUT: `put`, `put_all`, `put_prefix`, `put_range`
 * DELETE: `del`, `del_all`, `del_prefix`, `del_range`
 * LEASE: `lease_grant`, `lease_revoke`, `lease_ttl`, `lease_keep_alive_once`
-* WATCH: `watch`, `watch_forever`
+* WATCH: `watch`, `watch_forever`, `watch_prefix`, `watch_prefix_forever`
 * TRANSACTION: `transaction`
 * Distributed Lock: `Xfers::Etcd::Mutex`
 

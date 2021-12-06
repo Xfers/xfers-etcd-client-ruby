@@ -6,7 +6,7 @@
 <title>
   Class: Xfers::Etcd::Client
   
-    &mdash; Documentation by YARD 0.9.26
+    &mdash; Xfers Etcdv3 Client
   
 </title>
 
@@ -106,7 +106,8 @@
 
 <h2>Overview</h2><div class="docstring">
   <div class="discussion">
-    <p>Etcd v3 client class</p>
+    <p>Xfers etcd v3 client class, it wraps <a href="https://www.rubydoc.info/gems/etcdv3/" target="_parent" title="etcdv3-ruby">etcdv3-ruby</a> gem
+and provides some advanced feature like: <span class='object_link'><a href="Mutex.html" title="Xfers::Etcd::Mutex (class)">Mutex</a></span>, <span class='object_link'><a href="#watch_forever-instance_method" title="Xfers::Etcd::Client#watch_forever (method)">#watch_forever</a></span>...etc</p>
 
 
   </div>
@@ -124,7 +125,7 @@
       <li class="public ">
   <span class="summary_signature">
     
-      <a href="#client-instance_method" title="#client (instance method)">#<strong>client</strong>  &#x21d2; Object </a>
+      <a href="#client-instance_method" title="#client (instance method)">#<strong>client</strong>  &#x21d2; Etcdv3 </a>
     
 
     
@@ -143,7 +144,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Raw etcd client connection.</p>
+    <span class="summary_desc"><div class='inline'><p>Raw <a href="https://www.rubydoc.info/gems/etcdv3/Etcdv3" target="_parent" title="Etcdv3">Etcdv3</a> instance.</p>
 </div></span>
   
 </li>
@@ -395,7 +396,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_range-instance_method" title="#get_range (instance method)">#<strong>get_range</strong>(range_start, range_end, sort_target: :key, sort_order: :none)  &#x21d2; Array&lt;Mvccpb::KeyValue&gt; </a>
+      <a href="#get_range-instance_method" title="#get_range (instance method)">#<strong>get_range</strong>(range_start, range_end, keys_only: false, sort_target: :key, sort_order: :none)  &#x21d2; Array&lt;Mvccpb::KeyValue&gt; </a>
     
 
     
@@ -512,7 +513,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#lease_revoke-instance_method" title="#lease_revoke (instance method)">#<strong>lease_revoke</strong>(lease_id)  &#x21d2; Object </a>
+      <a href="#lease_revoke-instance_method" title="#lease_revoke (instance method)">#<strong>lease_revoke</strong>(lease_id)  </a>
     
 
     
@@ -581,7 +582,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#put-instance_method" title="#put (instance method)">#<strong>put</strong>(key, value, ttl: nil)  &#x21d2; Object </a>
+      <a href="#put-instance_method" title="#put (instance method)">#<strong>put</strong>(key, value, ttl: nil)  </a>
     
 
     
@@ -595,7 +596,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Save a value to etcd.</p>
+    <span class="summary_desc"><div class='inline'><p>Set a value to specific key.</p>
 </div></span>
   
 </li>
@@ -604,7 +605,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#transaction-instance_method" title="#transaction (instance method)">#<strong>transaction</strong>(timeout: nil, &amp;block)  &#x21d2; Object </a>
+      <a href="#transaction-instance_method" title="#transaction (instance method)">#<strong>transaction</strong>(timeout: nil) {|txn| ... } &#x21d2; Etcdserverpb::TxnResponse </a>
     
 
     
@@ -618,7 +619,8 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>Transaction.</p>
+</div></span>
   
 </li>
 
@@ -649,7 +651,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#watch-instance_method" title="#watch (instance method)">#<strong>watch</strong>(key, timeout: nil, &amp;block)  &#x21d2; Array&lt;Mvccpb::Event&gt;, Nil </a>
+      <a href="#watch-instance_method" title="#watch (instance method)">#<strong>watch</strong>(key, timeout: nil, start_revision: nil) {|events| ... } &#x21d2; Array&lt;Mvccpb::Event&gt;, Nil </a>
     
 
     
@@ -663,7 +665,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Watch for a key changes.</p>
+    <span class="summary_desc"><div class='inline'><p>Watch for changes on a key.</p>
 </div></span>
   
 </li>
@@ -672,7 +674,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#watch_forever-instance_method" title="#watch_forever (instance method)">#<strong>watch_forever</strong>(key, &amp;block)  &#x21d2; Object </a>
+      <a href="#watch_forever-instance_method" title="#watch_forever (instance method)">#<strong>watch_forever</strong>(key, start_revision: nil) {|events| ... } </a>
     
 
     
@@ -695,7 +697,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#watch_prefix-instance_method" title="#watch_prefix (instance method)">#<strong>watch_prefix</strong>(key_prefix, timeout: nil, &amp;block)  &#x21d2; Array&lt;Mvccpb::Event&gt;, Nil </a>
+      <a href="#watch_prefix-instance_method" title="#watch_prefix (instance method)">#<strong>watch_prefix</strong>(key_prefix, timeout: nil, start_revision: nil) {|events| ... } &#x21d2; Array&lt;Mvccpb::Event&gt;, Nil </a>
     
 
     
@@ -709,7 +711,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Watch for a range of key change with a prefix.</p>
+    <span class="summary_desc"><div class='inline'><p>Watch for changes on a specified key prefix.</p>
 </div></span>
   
 </li>
@@ -718,7 +720,7 @@
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#watch_prefix_forever-instance_method" title="#watch_prefix_forever (instance method)">#<strong>watch_prefix_forever</strong>(key_prefix, &amp;block)  &#x21d2; Object </a>
+      <a href="#watch_prefix_forever-instance_method" title="#watch_prefix_forever (instance method)">#<strong>watch_prefix_forever</strong>(key_prefix, start_revision: nil, &amp;block)  </a>
     
 
     
@@ -732,7 +734,7 @@
   
 
   
-    <span class="summary_desc"><div class='inline'><p>Watch forver for a range of key change with a prefix.</p>
+    <span class="summary_desc"><div class='inline'><p>Watch forever for changes on a specified key prefix.</p>
 </div></span>
   
 </li>
@@ -849,14 +851,14 @@
       <pre class="lines">
 
 
-21
-22
-23
 24
-25</pre>
+25
+26
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 21</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 24</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span><span class='lparen'>(</span><span class='op'>**</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
   <span class='ivar'>@client</span> <span class='op'>=</span> <span class='op'>::</span><span class='const'>Etcdv3</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='id identifier rubyid_options'>options</span><span class='rparen'>)</span>
@@ -878,7 +880,7 @@
       <div class="method_details first">
   <h3 class="signature first" id="client-instance_method">
   
-    #<strong>client</strong>  &#x21d2; <tt>Object</tt>  <span class="extras">(readonly)</span>
+    #<strong>client</strong>  &#x21d2; <tt>Etcdv3</tt>  <span class="extras">(readonly)</span>
   
 
   
@@ -886,13 +888,26 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Raw etcd client connection</p>
+    <p>Raw <a href="https://www.rubydoc.info/gems/etcdv3/Etcdv3" target="_parent" title="Etcdv3">Etcdv3</a> instance</p>
 
 
   </div>
 </div>
 <div class="tags">
   
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Etcdv3</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -900,12 +915,12 @@
       <pre class="lines">
 
 
-10
-11
-12</pre>
+13
+14
+15</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 10</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 13</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_client'>client</span>
   <span class='ivar'>@client</span>
@@ -964,12 +979,12 @@
       <pre class="lines">
 
 
-37
-38
-39</pre>
+40
+41
+42</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_db_size'>db_size</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:db_size</span><span class='rparen'>)</span>
@@ -1040,15 +1055,15 @@
       <pre class="lines">
 
 
-157
-158
-159
-160
-161
-162</pre>
+168
+169
+170
+171
+172
+173</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 157</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_del'>del</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1103,14 +1118,14 @@
       <pre class="lines">
 
 
-167
-168
-169
-170
-171</pre>
+178
+179
+180
+181
+182</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_del_all'>del_all</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1183,18 +1198,18 @@
       <pre class="lines">
 
 
-177
-178
-179
-180
-181
-182
-183
-184
-185</pre>
+189
+190
+191
+192
+193
+194
+195
+196
+197</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 177</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 189</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_del_prefix'>del_prefix</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1286,19 +1301,19 @@
       <pre class="lines">
 
 
-192
-193
-194
-195
-196
-197
-198
-199
-200
-201</pre>
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 192</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 205</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_del_range'>del_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range_start'>range_start</span><span class='comma'>,</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1376,20 +1391,22 @@
       <pre class="lines">
 
 
-45
-46
-47
-48
 49
-50</pre>
+50
+51
+52
+53
+54
+55</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 45</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_exist?'>exist?</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='label'>count_only:</span> <span class='kw'>true</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_count'>count</span> <span class='op'>&gt;</span> <span class='int'>0</span>
+    <span class='id identifier rubyid_count'>count</span> <span class='op'>=</span> <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>count_only:</span> <span class='kw'>true</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='op'>&amp;.</span><span class='id identifier rubyid_count'>count</span>
+    <span class='op'>!</span><span class='id identifier rubyid_count'>count</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='id identifier rubyid_count'>count</span> <span class='op'>&gt;</span> <span class='int'>0</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1458,15 +1475,15 @@
       <pre class="lines">
 
 
-57
-58
-59
-60
-61
-62</pre>
+62
+63
+64
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 62</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1521,14 +1538,14 @@
       <pre class="lines">
 
 
-67
-68
-69
-70
-71</pre>
+72
+73
+74
+75
+76</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 72</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_all'>get_all</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1587,7 +1604,7 @@
       
       
         &mdash;
-        <div class='inline'><p>returns only the keys and not the values.</p>
+        <div class='inline'><p>returns only the keys.</p>
 </div>
       
     </li>
@@ -1652,21 +1669,21 @@
       <pre class="lines">
 
 
-80
-81
-82
-83
-84
-85
 86
 87
 88
 89
 90
-91</pre>
+91
+92
+93
+94
+95
+96
+97</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_prefix'>get_prefix</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>keys_only:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>sort_target:</span> <span class='symbol'>:key</span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:none</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -1746,20 +1763,20 @@
       <pre class="lines">
 
 
-97
-98
-99
-100
-101
-102</pre>
+103
+104
+105
+106
+107
+108</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 97</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 103</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_prefix_count'>get_prefix_count</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key_prefix</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='label'>range_end:</span> <span class='id identifier rubyid_prefix_range_end'>prefix_range_end</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>count_only:</span> <span class='kw'>true</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>range_end:</span> <span class='id identifier rubyid_prefix_range_end'>prefix_range_end</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>count_only:</span> <span class='kw'>true</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -1770,7 +1787,7 @@
       <div class="method_details ">
   <h3 class="signature " id="get_range-instance_method">
   
-    #<strong>get_range</strong>(range_start, range_end, sort_target: :key, sort_order: :none)  &#x21d2; <tt>Array&lt;Mvccpb::KeyValue&gt;</tt> 
+    #<strong>get_range</strong>(range_start, range_end, keys_only: false, sort_target: :key, sort_order: :none)  &#x21d2; <tt>Array&lt;Mvccpb::KeyValue&gt;</tt> 
   
 
   
@@ -1813,6 +1830,23 @@
       
         &mdash;
         <div class='inline'><p>last key in range, exclusive</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>keys_only</span>
+      
+      
+        <span class='type'>(<tt>Boolean</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>false</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>returns only the keys.</p>
 </div>
       
     </li>
@@ -1877,28 +1911,30 @@
       <pre class="lines">
 
 
-112
-113
-114
-115
-116
-117
-118
 119
 120
 121
 122
-123</pre>
+123
+124
+125
+126
+127
+128
+129
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 119</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_get_range'>get_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range_start'>range_start</span><span class='comma'>,</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='comma'>,</span> <span class='label'>sort_target:</span> <span class='symbol'>:key</span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:none</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_get_range'>get_range</span><span class='lparen'>(</span><span class='id identifier rubyid_range_start'>range_start</span><span class='comma'>,</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='comma'>,</span> <span class='label'>keys_only:</span> <span class='kw'>false</span><span class='comma'>,</span> <span class='label'>sort_target:</span> <span class='symbol'>:key</span><span class='comma'>,</span> <span class='label'>sort_order:</span> <span class='symbol'>:none</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>range_start</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_range_start'>range_start</span><span class='rparen'>)</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>range_end</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_options'>options</span> <span class='op'>=</span> <span class='lbrace'>{</span>
       <span class='label'>range_end:</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='comma'>,</span>
+      <span class='label'>keys_only:</span> <span class='id identifier rubyid_keys_only'>keys_only</span><span class='comma'>,</span>
       <span class='label'>sort_target:</span> <span class='id identifier rubyid_sort_target'>sort_target</span><span class='comma'>,</span>
       <span class='label'>sort_order:</span> <span class='id identifier rubyid_sort_order'>sort_order</span><span class='comma'>,</span>
     <span class='rbrace'>}</span>
@@ -1986,22 +2022,22 @@
       <pre class="lines">
 
 
-130
-131
-132
-133
-134
-135
-136</pre>
+138
+139
+140
+141
+142
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_range_count'>get_range_count</span><span class='lparen'>(</span><span class='id identifier rubyid_range_start'>range_start</span><span class='comma'>,</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>range_start</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_range_start'>range_start</span><span class='rparen'>)</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>range_end</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_range_start'>range_start</span><span class='comma'>,</span> <span class='lbrace'>{</span><span class='label'>range_end:</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='comma'>,</span> <span class='label'>count_only:</span> <span class='kw'>true</span><span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
+    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_range_start'>range_start</span><span class='comma'>,</span> <span class='lbrace'>{</span> <span class='label'>range_end:</span> <span class='id identifier rubyid_range_end'>range_end</span><span class='comma'>,</span> <span class='label'>count_only:</span> <span class='kw'>true</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span>
   <span class='kw'>end</span>
 <span class='kw'>end</span></pre>
     </td>
@@ -2070,15 +2106,15 @@
       <pre class="lines">
 
 
-207
-208
-209
-210
-211
-212</pre>
+221
+222
+223
+224
+225
+226</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 207</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 221</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lease_grant'>lease_grant</span><span class='lparen'>(</span><span class='id identifier rubyid_ttl'>ttl</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -2152,15 +2188,15 @@
       <pre class="lines">
 
 
-240
-241
-242
-243
-244
-245</pre>
+258
+259
+260
+261
+262
+263</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 240</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 258</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lease_keep_alive_once'>lease_keep_alive_once</span><span class='lparen'>(</span><span class='id identifier rubyid_lease_id'>lease_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -2176,7 +2212,7 @@
       <div class="method_details ">
   <h3 class="signature " id="lease_revoke-instance_method">
   
-    #<strong>lease_revoke</strong>(lease_id)  &#x21d2; <tt>Object</tt> 
+    #<strong>lease_revoke</strong>(lease_id)  
   
 
   
@@ -2184,7 +2220,7 @@
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Revoke a lease</p>
+    <p class="note returns_void">This method returns an undefined value.</p><p>Revoke a lease</p>
 
 
   </div>
@@ -2217,16 +2253,16 @@
       <pre class="lines">
 
 
-217
-218
-219
-220
-221
-222
-223</pre>
+233
+234
+235
+236
+237
+238
+239</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 217</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 233</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lease_revoke'>lease_revoke</span><span class='lparen'>(</span><span class='id identifier rubyid_lease_id'>lease_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -2301,15 +2337,15 @@
       <pre class="lines">
 
 
-229
-230
-231
-232
-233
-234</pre>
+246
+247
+248
+249
+250
+251</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 229</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 246</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_lease_ttl'>lease_ttl</span><span class='lparen'>(</span><span class='id identifier rubyid_lease_id'>lease_id</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -2401,14 +2437,14 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-254
-255
-256
-257
-258</pre>
+272
+273
+274
+275
+276</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 254</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 272</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_mutex_new'>mutex_new</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='comma'>,</span> <span class='label'>ttl:</span> <span class='int'>60</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -2423,7 +2459,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="put-instance_method">
   
-    #<strong>put</strong>(key, value, ttl: nil)  &#x21d2; <tt>Object</tt> 
+    #<strong>put</strong>(key, value, ttl: nil)  
   
 
   
@@ -2431,7 +2467,7 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Save a value to etcd</p>
+    <p class="note returns_void">This method returns an undefined value.</p><p>Set a value to specific key</p>
 
 
   </div>
@@ -2450,7 +2486,22 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>key to set</p>
+        <div class='inline'><p>key name</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>value</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the value of key</p>
 </div>
       
     </li>
@@ -2481,18 +2532,18 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-142
-143
-144
-145
-146
-147
-148
-149
-150</pre>
+153
+154
+155
+156
+157
+158
+159
+160
+161</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 142</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 153</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_put'>put</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='id identifier rubyid_value'>value</span><span class='comma'>,</span> <span class='label'>ttl:</span> <span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -2511,26 +2562,68 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="transaction-instance_method">
   
-    #<strong>transaction</strong>(timeout: nil, &amp;block)  &#x21d2; <tt>Object</tt> 
+    #<strong>transaction</strong>(timeout: nil) {|txn| ... } &#x21d2; <tt>Etcdserverpb::TxnResponse</tt> 
   
 
   
 
   
-</h3><table class="source_code">
+</h3><div class="docstring">
+  <div class="discussion">
+    <p>Transaction</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>txn</span>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="Transaction.html" title="Xfers::Etcd::Transaction (class)">Xfers::Etcd::Transaction</a></span></tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>the transaction opertaion object</p>
+</div>
+      
+    </li>
+  
+</ul>
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>Etcdserverpb::TxnResponse</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-318
-319
-320
-321
-322</pre>
+356
+357
+358
+359
+360</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 318</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 356</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_transaction'>transaction</span><span class='lparen'>(</span><span class='label'>timeout:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
@@ -2584,12 +2677,12 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-30
-31
-32</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_version'>version</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span><span class='lparen'>(</span><span class='op'>&amp;</span><span class='symbol'>:version</span><span class='rparen'>)</span>
@@ -2602,7 +2695,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="watch-instance_method">
   
-    #<strong>watch</strong>(key, timeout: nil, &amp;block)  &#x21d2; <tt>Array&lt;Mvccpb::Event&gt;</tt>, <tt>Nil</tt> 
+    #<strong>watch</strong>(key, timeout: nil, start_revision: nil) {|events| ... } &#x21d2; <tt>Array&lt;Mvccpb::Event&gt;</tt>, <tt>Nil</tt> 
   
 
   
@@ -2610,7 +2703,7 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Watch for a key changes</p>
+    <p>Watch for changes on a key</p>
 
 
   </div>
@@ -2639,7 +2732,7 @@ be released after this time elapses, unless refreshed.</p>
         <span class='name'>timeout</span>
       
       
-        <span class='type'>(<tt>String</tt>)</span>
+        <span class='type'>(<tt>Integer</tt>)</span>
       
       
         <em class="default">(defaults to: <tt>nil</tt>)</em>
@@ -2651,8 +2744,44 @@ be released after this time elapses, unless refreshed.</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>start_revision</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the revision for where to inclusively begin watching</p>
+</div>
+      
+    </li>
+  
 </ul>
 
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>events</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Mvccpb::Event&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>a list of new events in sequence</p>
+</div>
+      
+    </li>
+  
+</ul>
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
@@ -2664,7 +2793,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>return events when event arrives, or Nil when timed out</p>
+        <div class='inline'><p>return events when event arrives if no given block, Nil when timed out or has given block</p>
 </div>
       
     </li>
@@ -2677,22 +2806,22 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-266
-267
-268
-269
-270
-271
-272
-273</pre>
+287
+288
+289
+290
+291
+292
+293
+294</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 266</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 287</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='id identifier rubyid_start_revision'>start_revision</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>rescue</span> <span class='const'>GRPC</span><span class='op'>::</span><span class='const'>DeadlineExceeded</span>
     <span class='kw'>nil</span>
   <span class='kw'>end</span>
@@ -2705,7 +2834,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="watch_forever-instance_method">
   
-    #<strong>watch_forever</strong>(key, &amp;block)  &#x21d2; <tt>Object</tt> 
+    #<strong>watch_forever</strong>(key, start_revision: nil) {|events| ... } 
   
 
   
@@ -2713,7 +2842,7 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Watch forever for a key changes</p>
+    <p class="note returns_void">This method returns an undefined value.</p><p>Watch forever for a key changes</p>
 
 
   </div>
@@ -2737,8 +2866,44 @@ be released after this time elapses, unless refreshed.</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>start_revision</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the revision for where to inclusively begin watching</p>
+</div>
+      
+    </li>
+  
 </ul>
 
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>events</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Mvccpb::Event&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>a list of new events in sequence</p>
+</div>
+      
+    </li>
+  
+</ul>
 
 </div><table class="source_code">
   <tr>
@@ -2746,29 +2911,31 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-278
-279
-280
-281
-282
-283
-284
-285
-286
-287</pre>
+304
+305
+306
+307
+308
+309
+310
+311
+312
+313
+314</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 278</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 304</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_watch_forever'>watch_forever</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_watch_forever'>watch_forever</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_loop'>loop</span> <span class='kw'>do</span>
-      <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>60</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>60</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='id identifier rubyid_start_revision'>start_revision</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
     <span class='kw'>rescue</span> <span class='const'>GRPC</span><span class='op'>::</span><span class='const'>DeadlineExceeded</span>
       <span class='kw'>next</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
+  <span class='kw'>nil</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -2778,7 +2945,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="watch_prefix-instance_method">
   
-    #<strong>watch_prefix</strong>(key_prefix, timeout: nil, &amp;block)  &#x21d2; <tt>Array&lt;Mvccpb::Event&gt;</tt>, <tt>Nil</tt> 
+    #<strong>watch_prefix</strong>(key_prefix, timeout: nil, start_revision: nil) {|events| ... } &#x21d2; <tt>Array&lt;Mvccpb::Event&gt;</tt>, <tt>Nil</tt> 
   
 
   
@@ -2786,7 +2953,7 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Watch for a range of key change with a prefix</p>
+    <p>Watch for changes on a specified key prefix</p>
 
 
   </div>
@@ -2815,7 +2982,7 @@ be released after this time elapses, unless refreshed.</p>
         <span class='name'>timeout</span>
       
       
-        <span class='type'>(<tt>String</tt>)</span>
+        <span class='type'>(<tt>Integer</tt>)</span>
       
       
         <em class="default">(defaults to: <tt>nil</tt>)</em>
@@ -2827,8 +2994,44 @@ be released after this time elapses, unless refreshed.</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>start_revision</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the revision for where to inclusively begin watching</p>
+</div>
+      
+    </li>
+  
 </ul>
 
+<p class="tag_title">Yield Parameters:</p>
+<ul class="yieldparam">
+  
+    <li>
+      
+        <span class='name'>events</span>
+      
+      
+        <span class='type'>(<tt>Array&lt;Mvccpb::Event&gt;</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>a list of new events in sequence</p>
+</div>
+      
+    </li>
+  
+</ul>
 <p class="tag_title">Returns:</p>
 <ul class="return">
   
@@ -2840,7 +3043,7 @@ be released after this time elapses, unless refreshed.</p>
       
       
         &mdash;
-        <div class='inline'><p>return events when event arrives, or Nil when timed out</p>
+        <div class='inline'><p>return events when event arrives if no given block, Nil when timed out or has given block</p>
 </div>
       
     </li>
@@ -2853,22 +3056,22 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-295
-296
-297
-298
-299
-300
-301
-302</pre>
+325
+326
+327
+328
+329
+330
+331
+332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 295</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 325</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_watch_prefix'>watch_prefix</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_watch_prefix'>watch_prefix</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key_prefix</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span>
-    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>range_end:</span> <span class='id identifier rubyid_prefix_range_end'>prefix_range_end</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+    <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>range_end:</span> <span class='id identifier rubyid_prefix_range_end'>prefix_range_end</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='id identifier rubyid_timeout'>timeout</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='id identifier rubyid_start_revision'>start_revision</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='kw'>rescue</span> <span class='const'>GRPC</span><span class='op'>::</span><span class='const'>DeadlineExceeded</span>
     <span class='kw'>nil</span>
   <span class='kw'>end</span>
@@ -2881,7 +3084,7 @@ be released after this time elapses, unless refreshed.</p>
       <div class="method_details ">
   <h3 class="signature " id="watch_prefix_forever-instance_method">
   
-    #<strong>watch_prefix_forever</strong>(key_prefix, &amp;block)  &#x21d2; <tt>Object</tt> 
+    #<strong>watch_prefix_forever</strong>(key_prefix, start_revision: nil, &amp;block)  
   
 
   
@@ -2889,7 +3092,7 @@ be released after this time elapses, unless refreshed.</p>
   
 </h3><div class="docstring">
   <div class="discussion">
-    <p>Watch forver for a range of key change with a prefix</p>
+    <p class="note returns_void">This method returns an undefined value.</p><p>Watch forever for changes on a specified key prefix</p>
 
 
   </div>
@@ -2913,6 +3116,23 @@ be released after this time elapses, unless refreshed.</p>
       
     </li>
   
+    <li>
+      
+        <span class='name'>start_revision</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'><p>the revision for where to inclusively begin watching</p>
+</div>
+      
+    </li>
+  
 </ul>
 
 
@@ -2922,25 +3142,25 @@ be released after this time elapses, unless refreshed.</p>
       <pre class="lines">
 
 
-307
-308
-309
-310
-311
-312
-313
-314
-315
-316</pre>
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 307</span>
+      <pre class="code"><span class="info file"># File 'lib/xfers/etcd/client.rb', line 340</span>
 
-<span class='kw'>def</span> <span class='id identifier rubyid_watch_prefix_forever'>watch_prefix_forever</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='id identifier rubyid_watch_prefix_forever'>watch_prefix_forever</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='kw'>nil</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_synchronize'>synchronize</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_client'>client</span><span class='op'>|</span>
     <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_valid_string_argument?'>valid_string_argument?</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>key_prefix</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_loop'>loop</span> <span class='kw'>do</span>
-      <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>range_end:</span> <span class='id identifier rubyid_prefix_range_end'>prefix_range_end</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>120</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
+      <span class='id identifier rubyid_client'>client</span><span class='period'>.</span><span class='id identifier rubyid_watch'>watch</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='comma'>,</span> <span class='label'>range_end:</span> <span class='id identifier rubyid_prefix_range_end'>prefix_range_end</span><span class='lparen'>(</span><span class='id identifier rubyid_key_prefix'>key_prefix</span><span class='rparen'>)</span><span class='comma'>,</span> <span class='label'>timeout:</span> <span class='int'>120</span><span class='comma'>,</span> <span class='label'>start_revision:</span> <span class='id identifier rubyid_start_revision'>start_revision</span><span class='comma'>,</span> <span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
     <span class='kw'>rescue</span> <span class='const'>GRPC</span><span class='op'>::</span><span class='const'>DeadlineExceeded</span>
       <span class='kw'>next</span>
     <span class='kw'>end</span>
@@ -2956,7 +3176,7 @@ be released after this time elapses, unless refreshed.</p>
 </div>
 
       <div id="footer">
-  Generated on Thu Dec  2 22:29:34 2021 by
+  Generated on Sun Dec  5 21:41:41 2021 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.26 (ruby-2.5.8).
 </div>

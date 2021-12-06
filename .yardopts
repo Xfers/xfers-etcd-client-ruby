@@ -1,2 +1,6 @@
+--title "Xfers Etcdv3 Client"
+--no-cache
 --markup markdown
 --no-private
+--hide-void-return
+--output-dir docs
