@@ -1,11 +1,15 @@
 require "spec_helper"
 
 describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
+  let(:endpoints) do
+    ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
+  end
+
   let(:conn1) do
-    Xfers::Etcd::Client.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+    Xfers::Etcd::Client.new(endpoints: endpoints, allow_reconnect: true)
   end
   let(:conn2) do
-    Xfers::Etcd::Client.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+    Xfers::Etcd::Client.new(endpoints: endpoints, allow_reconnect: true)
   end
 
   before do
@@ -129,18 +133,18 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 end
 
-def conn_access_test
-  conn1.put("balance", 1000.to_s)
+def conn_access_test(num_iters: 10, num_workers: 100)
+  conn1.put("balance", (num_iters*num_workers).to_s)
   conn1.mutex_new("balance_lock", ttl: 10).destroy!
 
   expect(conn1.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
 
-  conn_pool = Xfers::Etcd::Pool.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+  conn_pool = Xfers::Etcd::Pool.new(endpoints: endpoints, allow_reconnect: true)
   threads = []
-  10.times.each do
+  num_iters.times.each do
     threads << Thread.new do
-      100.times do
-        conn_pool.with do |conn|
+      num_workers.times do
+        conn_pool.with(timeout: 20) do |conn|
           loop do
             mutex = conn.mutex_new("balance_lock", ttl: 10)
             lock_result = mutex.lock(1) do
