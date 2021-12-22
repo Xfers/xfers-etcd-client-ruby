@@ -148,12 +148,14 @@ module Xfers
       # @param key [String] key name
       # @param value [String] the value of key
       # @param ttl [Integer] the advisory time-to-live in seconds, defaults to live forever
+      # @param lease [Integer] lease attached to the key, if ttl and lease are both provided, it will use ttl
       #
       # @return [void]
-      def put(key, value, ttl: nil)
+      def put(key, value, ttl: nil, lease: nil)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
           options = {}
+          options[:lease] = lease unless lease.nil?
           options[:lease] = self.lease_grant(ttl) if ttl&.respond_to?(:to_i)
           client.put(key, value.to_s, options)
           nil
