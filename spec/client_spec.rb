@@ -41,6 +41,13 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     expect(conn.exist?("key1")).to eq(false)
   end
 
+  it "#put with lease" do
+    lease = conn.lease_grant(1)
+    conn.put("key1", "value1", lease: lease)
+    sleep(3)
+    expect(conn.exist?("key1")).to eq(false)
+  end
+
   it "#exists?" do
     conn.put("key1", "")
 
