@@ -1,11 +1,15 @@
 require "spec_helper"
 
 describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
+  let(:endpoints) do
+    ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
+  end
+
   let(:pool) do
     described_class.new(
       pool_size: 8,
       pool_timeout: 2,
-      endpoints: "http://127.0.0.1:2379",
+      endpoints: endpoints,
       allow_reconnect: true
     )
   end
