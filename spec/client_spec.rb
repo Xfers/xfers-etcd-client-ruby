@@ -1,11 +1,15 @@
 require "spec_helper"
 
 describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
+  let(:endpoints) do
+    ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
+  end
+
   let(:conn) do
-    described_class.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+    described_class.new(endpoints: endpoints, allow_reconnect: true)
   end
   let(:conn2) do
-    described_class.new(endpoints: "http://127.0.0.1:2379", allow_reconnect: true)
+    described_class.new(endpoints: endpoints, allow_reconnect: true)
   end
 
   before do

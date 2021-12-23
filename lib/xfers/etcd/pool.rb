@@ -10,8 +10,8 @@ module Xfers
         end
       end
 
-      def with(&block)
-        @pool.with(&block)
+      def with(timeout: nil, &block)
+        @pool.with(timeout: timeout, &block)
       end
 
       def pool_shutdown(&block)

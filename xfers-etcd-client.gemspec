@@ -24,4 +24,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency "redis", "~> 4.4"
   s.add_development_dependency "redlock", "~> 1.2"
   s.add_development_dependency "rspec", "~> 3.7"
+  s.add_development_dependency "dotenv", "~> 2.7"
 end
