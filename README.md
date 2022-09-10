@@ -1,6 +1,7 @@
 # Xfers etcd v3 client
 The Etcd v3 client library, provide high level functions for Etcd v3.
 
+The full API document: https://xfers.github.io/xfers-etcd-client-ruby/
 # Features
 * GET: `get`, `get_all`, `get_prefix`, `get_prefix_count`, `get_range`, `get_range_count`
 * PUT: `put`, `put_all`, `put_prefix`, `put_range`
