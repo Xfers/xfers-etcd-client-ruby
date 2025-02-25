@@ -17,6 +17,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency "connection_pool", "~> 2.5"
   s.add_dependency "etcdv3", "~> 0.11"
-  s.add_dependency "google-protobuf", "~> 3.23"
-  s.add_dependency "grpc", "~> 1.17"
+  s.add_dependency "google-protobuf", "3.23"
+  s.add_dependency "grpc", "1.58"
 end
