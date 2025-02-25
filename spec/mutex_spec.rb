@@ -147,7 +147,7 @@ def conn_access_test(num_iters: 10, num_workers: 100)
           loop do
             mutex = conn.mutex_new("balance_lock", ttl: 10)
             lock_result = mutex.lock(1) do
-              balance = conn.get("balance").value.to_i
+              balance = conn.get("balance")&.value.to_i
               break if balance < 1
 
               conn.put("balance", (balance - 1).to_s)

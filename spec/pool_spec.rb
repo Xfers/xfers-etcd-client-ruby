@@ -102,7 +102,7 @@ describe Xfers::Etcd::Pool do
     recv_count = 0
     pool.watch("watch_key", timeout: 10) do |events|
       events.each do |event|
-        expect(event.kv.value).to be("test")
+        expect(event.kv.value).to eq("test")
       end
       recv_count += events.length
       break if recv_count >= 10
@@ -126,7 +126,7 @@ describe Xfers::Etcd::Pool do
     recv_count = 0
     pool.watch_forever("watch_key") do |events|
       events.each do |event|
-        expect(event.kv.value).to be("test")
+        expect(event.kv.value).to eq("test")
       end
       recv_count += events.length
       break if recv_count >= 10
@@ -150,6 +150,6 @@ describe Xfers::Etcd::Pool do
       ]
     end
 
-    expect(pool.get("key2").value).to be("new_value")
+    expect(pool.get("key2").value).to eq("new_value")
   end
 end
