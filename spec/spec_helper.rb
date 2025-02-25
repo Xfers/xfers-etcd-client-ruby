@@ -1,4 +1,4 @@
-require "xfers-etcd-client"
+require "xfers_etcd_client"
 require "dotenv"
 
 Dotenv.load

@@ -1,6 +1,6 @@
 require "benchmark"
 require "redis"
-require_relative "../lib/xfers-etcd-client"
+require_relative "../lib/xfers_etcd_client"
 
 etcd = Xfers::Etcd::Client.new(endpoints: "http://127.0.0.1:2379")
 etcd_pool = Xfers::Etcd::Pool.new(endpoints: "http://127.0.0.1:2379")

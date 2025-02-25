@@ -1,6 +1,6 @@
 require "benchmark/ips"
 require "redlock"
-require_relative "../lib/xfers-etcd-client"
+require_relative "../lib/xfers_etcd_client"
 
 etcd = Xfers::Etcd::Client.new(endpoints: "http://127.0.0.1:2379")
 mutex = etcd.mutex_new("/benchmark/lock1")

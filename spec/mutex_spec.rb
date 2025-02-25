@@ -1,25 +1,25 @@
 require "spec_helper"
 
-describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
+describe Xfers::Etcd::Mutex do
   let(:endpoints) do
     ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
   end
 
-  let(:conn1) do
+  let(:main_connection) do
     Xfers::Etcd::Client.new(endpoints: endpoints, allow_reconnect: true)
   end
-  let(:conn2) do
+  let(:secondary_connection) do
     Xfers::Etcd::Client.new(endpoints: endpoints, allow_reconnect: true)
   end
 
   before do
-    conn1.del("/etcd_mutex/lock1")
-    conn1.del("/etcd_mutex/lock2")
+    main_connection.del("/etcd_mutex/lock1")
+    main_connection.del("/etcd_mutex/lock2")
   end
 
   it "lock and unlock" do
-    mutex1 = conn1.mutex_new("lock1", ttl: 60)
-    mutex2 = conn1.mutex_new("lock2", ttl: 10)
+    mutex1 = main_connection.mutex_new("lock1", ttl: 60)
+    mutex2 = main_connection.mutex_new("lock2", ttl: 10)
     expect(mutex1.lock(2)).to be(true)
     expect(mutex2.lock(2)).to be(true)
     expect(mutex2.unlock).to be(true)
@@ -27,7 +27,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "#try_lock" do
-    mutex = conn1.mutex_new("lock1", ttl: 60)
+    mutex = main_connection.mutex_new("lock1", ttl: 60)
     lock_time = Time.now
     mutex.lock
     result = mutex.try_lock
@@ -47,7 +47,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "#try_lock!" do
-    mutex = conn1.mutex_new("lock1", ttl: 60)
+    mutex = main_connection.mutex_new("lock1", ttl: 60)
     lock_time = Time.now
     mutex.lock
     expect do
@@ -68,8 +68,8 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "#lock with same name in single thread" do
-    mutex1 = conn1.mutex_new("lock1", ttl: 2)
-    mutex2 = conn1.mutex_new("lock1", ttl: 10)
+    mutex1 = main_connection.mutex_new("lock1", ttl: 2)
+    mutex2 = main_connection.mutex_new("lock1", ttl: 10)
 
     first_lock_time = Time.now
     mutex1.lock(10)
@@ -79,7 +79,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "#lock with same name in multiple threads" do
-    mutex1 = conn1.mutex_new("lock1", ttl: 2)
+    mutex1 = main_connection.mutex_new("lock1", ttl: 2)
 
     first_lock_time = Time.now
     mutex1.lock
@@ -87,7 +87,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     threads = []
     5.times do
       threads << Thread.new do
-        mutex = conn2.mutex_new("lock1", ttl: 10)
+        mutex = secondary_connection.mutex_new("lock1", ttl: 10)
         sleep(rand(15) / 10.0)
         mutex.lock(10) do
           locked_elasped = Time.now - first_lock_time
@@ -99,14 +99,14 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "#lock timed out" do
-    mutex1 = conn1.mutex_new("lock1")
+    mutex1 = main_connection.mutex_new("lock1")
     mutex1.lock
     expect(mutex1.lock(0.1)).to be(false)
     mutex1.unlock
   end
 
   it "#lock! timed out" do
-    mutex1 = conn1.mutex_new("lock1")
+    mutex1 = main_connection.mutex_new("lock1")
     mutex1.lock!
     expect do
       mutex1.lock!(0.1)
@@ -115,7 +115,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   end
 
   it "mutex refresh" do
-    mutex1 = conn1.mutex_new("lock1", ttl: 2)
+    mutex1 = main_connection.mutex_new("lock1", ttl: 2)
     lock_time = Time.now
     mutex1.lock(7) do |mutex|
       5.times do

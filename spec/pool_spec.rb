@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
+describe Xfers::Etcd::Pool do
   let(:endpoints) do
     ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
   end
@@ -102,7 +102,7 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
     recv_count = 0
     pool.watch("watch_key", timeout: 10) do |events|
       events.each do |event|
-        expect(event.kv.value).to eq("test")
+        expect(event.kv.value).to be("test")
       end
       recv_count += events.length
       break if recv_count >= 10
@@ -126,7 +126,7 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
     recv_count = 0
     pool.watch_forever("watch_key") do |events|
       events.each do |event|
-        expect(event.kv.value).to eq("test")
+        expect(event.kv.value).to be("test")
       end
       recv_count += events.length
       break if recv_count >= 10
@@ -150,6 +150,6 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
       ]
     end
 
-    expect(pool.get("key2").value).to eq("new_value")
+    expect(pool.get("key2").value).to be("new_value")
   end
 end

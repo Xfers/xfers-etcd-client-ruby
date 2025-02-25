@@ -247,6 +247,10 @@ Metrics/BlockNesting:
   Enabled: false
 Lint/EmptyBlock:
   Enabled: true
+RSpec/SpecFilePathFormat:
+  Enabled: False
+RSpec/FilePath:
+  Enabled: False
 
 Bundler/OrderedGems:
   Enabled: true
