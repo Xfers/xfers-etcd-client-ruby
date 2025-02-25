@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Xfers::Etcd::Mutex do
   let(:endpoints) do
-    ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
+    ENV.fetch("ETCD_ENDPOINTS", "http://127.0.0.1:2379")
   end
 
   let(:main_connection) do
@@ -126,40 +126,38 @@ describe Xfers::Etcd::Mutex do
     expect(Time.now - lock_time).to be > 1
   end
 
-  it "conncurrent access" do # rubocop: disable RSpec/NoExpectationExample
+  it "concurrent access" do
+    num_iters = 10
+    num_workers = 100
     2.times do
-      conn_access_test
-    end
-  end
-end
+      main_connection.put("balance", (num_iters * num_workers).to_s)
+      main_connection.mutex_new("balance_lock", ttl: 10).destroy!
 
-def conn_access_test(num_iters: 10, num_workers: 100)
-  main_connection.put("balance", (num_iters * num_workers).to_s)
-  main_connection.mutex_new("balance_lock", ttl: 10).destroy!
+      expect(main_connection.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
 
-  expect(main_connection.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
+      conn_pool = Xfers::Etcd::Pool.new(endpoints: endpoints, allow_reconnect: true)
+      threads = num_iters.times.map do
+        Thread.new do
+          num_workers.times do
+            conn_pool.with(timeout: 20) do |conn|
+              loop do
+                mutex = conn.mutex_new("balance_lock", ttl: 10)
+                lock_result = mutex.lock(1) do
+                  balance = conn.get("balance")&.value.to_i
+                  break if balance < 1
 
-  conn_pool = Xfers::Etcd::Pool.new(endpoints: endpoints, allow_reconnect: true)
-  threads = num_iters.times.map do
-    Thread.new do
-      num_workers.times do
-        conn_pool.with(timeout: 20) do |conn|
-          loop do
-            mutex = conn.mutex_new("balance_lock", ttl: 10)
-            lock_result = mutex.lock(1) do
-              balance = conn.get("balance")&.value.to_i
-              break if balance < 1
-
-              conn.put("balance", (balance - 1).to_s)
+                  conn.put("balance", (balance - 1).to_s)
+                end
+                break if lock_result
+              end
             end
-            break if lock_result
           end
         end
       end
+
+      threads.each(&:join)
+
+      expect(conn_pool.get("balance").value.to_i).to be 0
     end
   end
-
-  threads.each(&:join)
-
-  expect(conn_pool.get("balance").value.to_i).to be 0
 end

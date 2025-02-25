@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe Xfers::Etcd::Pool do
   let(:endpoints) do
-    ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
+    ENV.fetch("ETCD_ENDPOINTS", "http://127.0.0.1:2379")
   end
 
   let(:pool) do
