@@ -4,8 +4,8 @@ Gem::Specification.new do |s|
   s.name          = "xfers-etcd-client"
   s.version       = Xfers::Etcd::VERSION
   s.license       = "MIT"
-  s.authors       = ["Arlo Liu"]
-  s.email         = "arlo@xfers.com"
+  s.authors       = ["Arlo Liu", "Eshton Robateau"]
+  s.email         = "arlo@xfers.com, eshton.robateau@fazzfinancial.com"
 
   s.summary       = "Xfers etcd client module"
   s.description   = "Xfers etcd client"
@@ -17,15 +17,4 @@ Gem::Specification.new do |s|
 
   s.add_dependency "connection_pool", "~> 2.5"
   s.add_dependency "etcdv3", "~> 0.11"
-
-  s.add_development_dependency "benchmark-ips", "~> 2.9"
-  s.add_development_dependency "pry-byebug", "~> 3.9"
-  s.add_development_dependency "rake", "~> 13.0"
-  s.add_development_dependency "redis", "~> 4.4"
-  s.add_development_dependency "redlock", "~> 1.2"
-  s.add_development_dependency "rspec", "~> 3.7"
-  s.add_development_dependency "dotenv", "~> 2.7"
-  s.add_development_dependency 'rubocop', '~> 1.28'
-  s.add_development_dependency 'rubocop-rspec', '~> 2.10'
-
 end

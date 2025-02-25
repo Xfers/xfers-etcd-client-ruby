@@ -25,13 +25,13 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
   it "#put with TTL" do
     pool.put("key1", "value1", ttl: 1)
     sleep(3)
-    expect(pool.exist?("key1")).to eq(false)
+    expect(pool.exist?("key1")).to be(false)
   end
 
   it "#get" do
     pool.put("key1", "value1")
     expect(pool.get("key1").value).to eq("value1")
-    expect(pool.get("nonexist")).to eq(nil)
+    expect(pool.get("nonexist")).to be_nil
   end
 
   it "#get_all" do
@@ -111,7 +111,7 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
     # should timeout after 1 second
     pool.with do |conn|
       events = conn.watch("watch_key", timeout: 0.2)
-      expect(events).to eq(nil)
+      expect(events).to be_nil
     end
   end
 
@@ -134,7 +134,7 @@ describe Xfers::Etcd::Pool do # rubocop:disable RSpec/FilePath
 
     # should timeout after 1 second
     events = pool.watch("watch_key", timeout: 0.2)
-    expect(events).to eq(nil)
+    expect(events).to be_nil
   end
 
   it "#transaction" do

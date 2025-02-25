@@ -20,10 +20,10 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   it "lock and unlock" do
     mutex1 = conn1.mutex_new("lock1", ttl: 60)
     mutex2 = conn1.mutex_new("lock2", ttl: 10)
-    expect(mutex1.lock(2)).to eq(true)
-    expect(mutex2.lock(2)).to eq(true)
-    expect(mutex2.unlock).to eq(true)
-    expect(mutex1.unlock).to eq(true)
+    expect(mutex1.lock(2)).to be(true)
+    expect(mutex2.lock(2)).to be(true)
+    expect(mutex2.unlock).to be(true)
+    expect(mutex1.unlock).to be(true)
   end
 
   it "#try_lock" do
@@ -52,7 +52,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     mutex.lock
     expect do
       mutex.try_lock!
-    end.to raise_error(::Xfers::Etcd::LockError)
+    end.to raise_error(Xfers::Etcd::LockError)
     expect(Time.now - lock_time).to be < 1
 
     mutex.unlock
@@ -101,7 +101,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
   it "#lock timed out" do
     mutex1 = conn1.mutex_new("lock1")
     mutex1.lock
-    expect(mutex1.lock(0.1)).to eq(false)
+    expect(mutex1.lock(0.1)).to be(false)
     mutex1.unlock
   end
 
@@ -110,7 +110,7 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
     mutex1.lock!
     expect do
       mutex1.lock!(0.1)
-    end.to raise_error(::Xfers::Etcd::LockError)
+    end.to raise_error(Xfers::Etcd::LockError)
     mutex1.unlock
   end
 
@@ -134,15 +134,14 @@ describe Xfers::Etcd::Mutex do # rubocop:disable RSpec/FilePath
 end
 
 def conn_access_test(num_iters: 10, num_workers: 100)
-  conn1.put("balance", (num_iters*num_workers).to_s)
+  conn1.put("balance", (num_iters * num_workers).to_s)
   conn1.mutex_new("balance_lock", ttl: 10).destroy!
 
   expect(conn1.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
 
   conn_pool = Xfers::Etcd::Pool.new(endpoints: endpoints, allow_reconnect: true)
-  threads = []
-  num_iters.times.each do
-    threads << Thread.new do
+  threads = num_iters.times.map do
+    Thread.new do
       num_workers.times do
         conn_pool.with(timeout: 20) do |conn|
           loop do

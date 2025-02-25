@@ -247,3 +247,9 @@ Metrics/BlockNesting:
   Enabled: false
 Lint/EmptyBlock:
   Enabled: true
+
+Bundler/OrderedGems:
+  Enabled: true
+
+Gemspec/RequireMFA:
+  Enabled: false
