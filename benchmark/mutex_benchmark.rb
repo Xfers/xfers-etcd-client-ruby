@@ -5,7 +5,7 @@ require_relative "../lib/xfers-etcd-client"
 etcd = Xfers::Etcd::Client.new(endpoints: "http://127.0.0.1:2379")
 mutex = etcd.mutex_new("/benchmark/lock1")
 
-redlock = Redlock::Client.new([ "redis://127.0.0.1:6379" ])
+redlock = Redlock::Client.new(["redis://127.0.0.1:6379"])
 
 Benchmark.ips do |x|
   x.config(time: 2, warmup: 0)
