@@ -126,7 +126,7 @@ describe Xfers::Etcd::Mutex do
     expect(Time.now - lock_time).to be > 1
   end
 
-  it "conncurrent access" do
+  it "conncurrent access" do # rubocop: disable RSpec/NoExpectationExample
     2.times do
       conn_access_test
     end
@@ -134,10 +134,10 @@ describe Xfers::Etcd::Mutex do
 end
 
 def conn_access_test(num_iters: 10, num_workers: 100)
-  conn1.put("balance", (num_iters * num_workers).to_s)
-  conn1.mutex_new("balance_lock", ttl: 10).destroy!
+  main_connection.put("balance", (num_iters * num_workers).to_s)
+  main_connection.mutex_new("balance_lock", ttl: 10).destroy!
 
-  expect(conn1.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
+  expect(main_connection.mutex_new("balance_lock", ttl: 10).lock_exist?).to be(false)
 
   conn_pool = Xfers::Etcd::Pool.new(endpoints: endpoints, allow_reconnect: true)
   threads = num_iters.times.map do

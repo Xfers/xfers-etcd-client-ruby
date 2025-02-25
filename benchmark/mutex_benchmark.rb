@@ -16,7 +16,7 @@ Benchmark.ips do |x|
   end
 
   x.report("etcd lock block") do
-    mutex.lock do; end
+    mutex.lock
   end
 
   x.report("redlock lock/unlock") do
