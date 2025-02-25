@@ -19,10 +19,10 @@ module Xfers
       # @param endpoints [String] the etcd server endpoints, seperated by commas
       # @param allow_reconnect [Boolean] allow to reconnect, defaults to `true`
       # @param command_timeout [Integer] the default global timeout, unit is second, defaults to `120`
-      # @param user [String] the user name for authentication (if RBAC enabled on server side)
+      # @param user [String] the username for authentication (if RBAC enabled on server side)
       # @param password [String] the user password for authentication (if RBAC enabled on server side)
       def initialize(**options)
-        @client = ::Etcdv3.new(options)
+        @client = ::Etcdv3.new(**options)
 
         super() # Monitor#initialize
       end
@@ -99,7 +99,7 @@ module Xfers
       # Get the count of keys with the prefix
       # @param key_prefix [String] the key prefix
       #
-      # @return [Integer] the count the count of keys with the prefix
+      # @return [Integer] the count of keys with the prefix
       def get_prefix_count(key_prefix)
         synchronize do |client|
           self.class.valid_string_argument?("key_prefix", key_prefix)

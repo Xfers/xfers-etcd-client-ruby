@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage      = "https://github.com/Xfers/xfers-etcd-client-ruby"
   s.require_paths = ["lib"]
 
-  s.add_dependency "connection_pool", "~> 2.2"
+  s.add_dependency "connection_pool", "~> 2.5"
   s.add_dependency "etcdv3", "~> 0.11"
 
   s.add_development_dependency "benchmark-ips", "~> 2.9"
