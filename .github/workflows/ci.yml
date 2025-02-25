@@ -4,11 +4,20 @@ on:
   push:
     branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      etcd:
+        image: quay.io/coreos/etcd:v3.5.0
+        env:
+          ETCD_NAME: xfers_etcd
+          ETCD_DATA_DIR: /etcd-data
+          ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+          ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379
+        ports:
+          - 2379:2379
     strategy:
       matrix:
         ruby-version: [ '2.5', '2.7', '3.1', '3.3' ]
