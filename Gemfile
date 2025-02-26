@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 gem "connection_pool", "~> 2.5"
 gem "etcdv3", "~> 0.11"
-gem "google-protobuf", "3.25.3"
+gem "google-protobuf", "3.25.4"
 gem "grpc", "1.64"
 
 group :test, :development do
