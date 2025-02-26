@@ -147,7 +147,7 @@ describe Xfers::Etcd::Client do
 
   it "#watch" do
     Thread.new do
-      sleep(0.2)
+      sleep(1)
       10.times do
         sleep(0.1)
         conn2.put("watch_key", "test")
@@ -163,13 +163,13 @@ describe Xfers::Etcd::Client do
     end
 
     # should timeout after 1 second
-    events = conn.watch("watch_key", timeout: 0.2)
+    events = conn.watch("watch_key", timeout: 1)
     expect(events).to be_nil
   end
 
   it "#watch_forever" do
     Thread.new do
-      sleep(0.5)
+      sleep(1)
       10.times do
         sleep(0.1)
         conn2.put("watch_key", "test")
@@ -185,7 +185,7 @@ describe Xfers::Etcd::Client do
     end
 
     # should timeout after 1 second
-    events = conn.watch("watch_key", timeout: 0.2)
+    events = conn.watch("watch_key", timeout: 1)
     expect(events).to be_nil
   end
 

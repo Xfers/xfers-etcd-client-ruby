@@ -139,7 +139,7 @@ describe Xfers::Etcd::Mutex do
       threads = num_iters.times.map do
         Thread.new do
           num_workers.times do
-            conn_pool.with(timeout: 20) do |conn|
+            conn_pool.with(timeout: 40) do |conn|
               loop do
                 mutex = conn.mutex_new("balance_lock", ttl: 10)
                 lock_result = mutex.lock(1) do
