@@ -20,7 +20,7 @@ jobs:
           - 2379:2379
     strategy:
       matrix:
-        ruby-version: [ '2.5', '2.7', '3.1', '3.3' ]
+        ruby-version: ['2.7', '3.1', '3.2', '3.3' ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

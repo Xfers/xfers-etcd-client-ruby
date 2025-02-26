@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.summary       = "Xfers etcd client module"
   s.description   = "Xfers etcd client"
-  s.required_ruby_version = Gem::Requirement.new(">= 2.5.0")
+  s.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   s.files         = Dir["README.md", "lib/xfers_etcd_client.rb", "lib/**/*"]
   s.homepage      = "https://github.com/Xfers/xfers-etcd-client-ruby"
