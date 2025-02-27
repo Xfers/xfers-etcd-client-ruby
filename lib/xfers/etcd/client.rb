@@ -49,7 +49,7 @@ module Xfers
       def exist?(key)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
-          count = client.get(key, { count_only: true })&.count
+          count = client.get(key, count_only: true)&.count
           !count.nil? && count > 0
         end
       end
@@ -92,7 +92,7 @@ module Xfers
             sort_target: sort_target,
             sort_order: sort_order,
           }
-          client.get(key_prefix, options).kvs
+          client.get(key_prefix, **options).kvs
         end
       end
 
@@ -103,7 +103,7 @@ module Xfers
       def get_prefix_count(key_prefix)
         synchronize do |client|
           self.class.valid_string_argument?("key_prefix", key_prefix)
-          client.get(key_prefix, { range_end: prefix_range_end(key_prefix), count_only: true }).count
+          client.get(key_prefix, range_end: prefix_range_end(key_prefix), count_only: true).count
         end
       end
 
@@ -126,7 +126,7 @@ module Xfers
             sort_target: sort_target,
             sort_order: sort_order,
           }
-          client.get(range_start, options).kvs
+          client.get(range_start, **options).kvs
         end
       end
 
@@ -139,7 +139,7 @@ module Xfers
         synchronize do |client|
           self.class.valid_string_argument?("range_start", range_start)
           self.class.valid_string_argument?("range_end", range_end)
-          client.get(range_start, { range_end: range_end, count_only: true }).count
+          client.get(range_start, range_end: range_end, count_only: true).count
         end
       end
 
@@ -157,7 +157,7 @@ module Xfers
           options = {}
           options[:lease] = lease unless lease.nil?
           options[:lease] = self.lease_grant(ttl) if ttl&.respond_to?(:to_i)
-          client.put(key, value.to_s, options)
+          client.put(key, value.to_s, **options)
           nil
         end
       end
@@ -170,7 +170,7 @@ module Xfers
       def del(key)
         synchronize do |client|
           self.class.valid_string_argument?("key", key)
-          client.del(key, {}).deleted
+          client.del(key, **{}).deleted
         end
       end
 
@@ -194,7 +194,7 @@ module Xfers
           options = {
             range_end: prefix_range_end(key_prefix),
           }
-          client.del(key_prefix, options).deleted
+          client.del(key_prefix, **options).deleted
         end
       end
 
@@ -211,7 +211,7 @@ module Xfers
           options = {
             range_end: range_end,
           }
-          client.del(range_start, options).deleted
+          client.del(range_start, **options).deleted
         end
       end
 
