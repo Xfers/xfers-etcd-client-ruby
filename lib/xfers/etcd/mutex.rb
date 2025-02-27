@@ -45,7 +45,7 @@ module Xfers
       # @yieldparam [Xfers::Etcd::Mutex] mutex the self mutex object
       #
       # @raise [Xfers::Etcd::LockError] if timeout or failed to acquire lock
-      # @raise [Xfers::Etcd::UnockError] if failed to release lock
+      # @raise [Xfers::Etcd::UnlockError] if failed to release lock
       #
       # @return [void]
       def lock!(timeout = 10, &block)

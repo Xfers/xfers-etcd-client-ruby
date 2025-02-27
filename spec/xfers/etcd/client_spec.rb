@@ -1,8 +1,8 @@
 require "spec_helper"
 
-describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
+describe Xfers::Etcd::Client do
   let(:endpoints) do
-    ENV["ETCD_ENDPOINTS"] || "http://127.0.0.1:2379"
+    ENV.fetch("ETCD_ENDPOINTS", "http://127.0.0.1:2379")
   end
 
   let(:conn) do
@@ -42,27 +42,27 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
   it "#put with TTL" do
     conn.put("key1", "value1", ttl: 1)
     sleep(3)
-    expect(conn.exist?("key1")).to eq(false)
+    expect(conn.exist?("key1")).to be(false)
   end
 
   it "#put with lease" do
     lease = conn.lease_grant(1)
     conn.put("key1", "value1", lease: lease)
     sleep(3)
-    expect(conn.exist?("key1")).to eq(false)
+    expect(conn.exist?("key1")).to be(false)
   end
 
   it "#exists?" do
     conn.put("key1", "")
 
-    expect(conn.exist?("key1")).to eq(true)
-    expect(conn.exist?("key2")).to eq(false)
+    expect(conn.exist?("key1")).to be(true)
+    expect(conn.exist?("key2")).to be(false)
   end
 
   it "#get" do
     conn.put("key1", "value1")
     expect(conn.get("key1").value).to eq("value1")
-    expect(conn.get("nonexist")).to eq(nil)
+    expect(conn.get("nonexist")).to be_nil
   end
 
   it "#get_all" do
@@ -147,7 +147,7 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
 
   it "#watch" do
     Thread.new do
-      sleep(0.2)
+      sleep(1)
       10.times do
         sleep(0.1)
         conn2.put("watch_key", "test")
@@ -163,13 +163,13 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     end
 
     # should timeout after 1 second
-    events = conn.watch("watch_key", timeout: 0.2)
-    expect(events).to eq(nil)
+    events = conn.watch("watch_key", timeout: 1)
+    expect(events).to be_nil
   end
 
   it "#watch_forever" do
     Thread.new do
-      sleep(0.5)
+      sleep(1)
       10.times do
         sleep(0.1)
         conn2.put("watch_key", "test")
@@ -185,8 +185,8 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     end
 
     # should timeout after 1 second
-    events = conn.watch("watch_key", timeout: 0.2)
-    expect(events).to eq(nil)
+    events = conn.watch("watch_key", timeout: 1)
+    expect(events).to be_nil
   end
 
   it "#watch_prefix" do
@@ -207,7 +207,7 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     end
 
     events = conn.watch_prefix("records/", timeout: 0.2)
-    expect(events).to eq(nil)
+    expect(events).to be_nil
   end
 
   it "#watch_prefix_forever" do
@@ -227,7 +227,7 @@ describe Xfers::Etcd::Client do # rubocop:disable RSpec/FilePath
     end
 
     events = conn.watch_prefix("records/", timeout: 0.2)
-    expect(events).to eq(nil)
+    expect(events).to be_nil
   end
 
   it "#transaction" do

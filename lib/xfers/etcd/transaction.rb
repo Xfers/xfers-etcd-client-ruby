@@ -6,7 +6,7 @@ module Xfers
     #
     # Available comparison types: `:equal`, `:greater`, `:less`, `:not_equal`
     class Transaction
-      # Set a list of comparision operations representing a conjunction of terms for guarding the transaction
+      # Set a list of comparison operations representing a conjunction of terms for guarding the transaction
       # @param value [Array<Etcdserverpb::Compare>]
       #
       # @return [void]

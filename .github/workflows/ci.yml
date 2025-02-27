@@ -10,17 +10,20 @@ jobs:
     runs-on: ubuntu-latest
     services:
       etcd:
-        image: quay.io/coreos/etcd:v3.5.0
+        image: quay.io/coreos/etcd:v3.5.18
         env:
           ETCD_NAME: xfers_etcd
           ETCD_DATA_DIR: /etcd-data
           ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+          ETCD_LISTEN_PEER_URLS: http://127.0.0.1:2380
           ETCD_ADVERTISE_CLIENT_URLS: http://127.0.0.1:2379
         ports:
           - 2379:2379
     strategy:
       matrix:
-        ruby-version: [ '2.5', '2.7', '3.1', '3.3' ]
+        ruby-version: ['2.7', '3.1', '3.2', '3.3' ]
+    env:
+      DISABLE_SPRING: 1
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -33,4 +36,4 @@ jobs:
       - name: Ruby lint
         run: bundle exec rubocop
       - name: Run tests
-        run: bundle exec rspec spec
+        run: bundle exec rake

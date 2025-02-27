@@ -2,7 +2,7 @@ require:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.7
   NewCops: enable
   SuggestExtensions: false
 Style/Documentation:
@@ -247,3 +247,9 @@ Metrics/BlockNesting:
   Enabled: false
 Lint/EmptyBlock:
   Enabled: true
+
+Bundler/OrderedGems:
+  Enabled: true
+
+Gemspec/RequireMFA:
+  Enabled: false
