@@ -1,4 +1,4 @@
-# Deprcation Notice
+# Deprecation Notice
 The underlying connector has rotted due to gRPC breaking changes. Since usage has drop to near zero,
 no more development will happen for this gem. THIS GEM WILL NOT WORK EFFICIENTLY (OR POSSIBLY CORRECTLY) BEYOND RUBY 2.7
 
